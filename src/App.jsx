@@ -141,14 +141,14 @@ export default function App() {
           <section className="relative pt-32 pb-16 px-6 overflow-hidden">
             <div className="max-w-7xl mx-auto relative z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#bef264]/10 border border-[#bef264]/20 text-[#bef264] text-[9px] font-black uppercase tracking-[0.3em] mb-6">
-                <ShieldCheck size={12} /> Habilitation SIV Officielle
+                <CheckCircle2 size={12} /> Démarches Carte Grise Incluses
               </div>
               <h1 className="text-5xl md:text-8xl font-black text-white italic leading-[0.9] tracking-tighter uppercase mb-6">
                 Le Privilège <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#bef264] to-white">Automobile.</span>
               </h1>
               <p className="text-slate-400 max-w-lg text-sm md:text-lg font-medium leading-relaxed italic border-l-2 border-[#bef264] pl-4 mb-8">
-                Achat, vente, dépôt-vente et service carte grise à Bapaume. L'excellence sélectionnée pour vous.
+                Achat, vente, dépôt-vente et gestion administrative à Bapaume. L'excellence sélectionnée pour vous.
               </p>
               <div className="flex gap-4">
                 <button className="flex-1 sm:flex-none bg-[#bef264] text-black px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white transition-all italic">
@@ -208,9 +208,9 @@ export default function App() {
           <section className="bg-black/50 py-20 border-y border-white/5">
             <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
               {[
-                { icon: <ShieldCheck />, title: "Garantie 12 Mois", desc: "Tous nos véhicules sont révisés et garantis." },
-                { icon: <Award />, title: "Expertise SIV", desc: "Service carte grise immédiat sur place." },
-                { icon: <Zap />, title: "Rachat Cash", desc: "Estimation et paiement sous 24h." },
+                { icon: <ShieldCheck />, title: "Garantie 3 Mois", desc: "Révisés et garantis, extension possible." },
+                { icon: <Award />, title: "Démarches ANTS", desc: "On s'occupe de votre nouvelle carte grise." },
+                { icon: <Zap />, title: "750+ Ventes", desc: "Une expertise prouvée par nos clients." },
                 { icon: <Handshake />, title: "Dépôt-Vente", desc: "Confiez-nous votre véhicule en toute sécurité." }
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center text-center p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-[#bef264]/30 transition-colors">
