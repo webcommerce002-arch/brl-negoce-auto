@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#050505] text-slate-200;
+    /* Effet de grille perforée type carrosserie/haut-parleur */
+    background-image: 
+      radial-gradient(#1a1a1a 1px, transparent 1px);
+    background-size: 12px 12px;
+  }
+}
+
+.metal-gradient {
+  background: linear-gradient(145deg, #333, #111);
+}
+
+.neon-glow {
+  box-shadow: 0 0 15px rgba(190, 242, 100, 0.3);
+}
+
+.text-metal {
+  background: linear-gradient(to bottom, #ffffff 0%, #94a3b8 50%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
