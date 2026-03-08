@@ -102,7 +102,7 @@ export default function App() {
   // Admin Auth
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPass, setAdminPass] = useState("");
-  const ADMIN_SECRET = "1234"; // Vous pouvez changer le mot de passe ici
+  const ADMIN_SECRET = "Brlnegoce62138!"; // Mot de passe mis à jour
 
   const [newCar, setNewCar] = useState({
     brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", 
