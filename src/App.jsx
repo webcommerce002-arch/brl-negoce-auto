@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Plus, 
   Trash2, 
@@ -33,7 +33,9 @@ import {
   ArrowUpRight,
   Info,
   User,
-  Quote
+  Quote,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 
 // --- CONFIGURATION ---
@@ -49,6 +51,34 @@ const BRAND = {
     darker: "#050505",
     textGray: "#94a3b8"
   }
+};
+
+// --- COMPOSANT LOGO IDENTIQUE ---
+const BRLLogo = ({ size = "md", className = "" }) => {
+  const sizes = {
+    sm: "w-12 h-12",
+    md: "w-16 h-16",
+    lg: "w-32 h-32",
+    xl: "w-48 h-48"
+  };
+  
+  return (
+    <div className={`relative rounded-full border-[3px] border-[#bef264] flex items-center justify-center bg-black overflow-hidden shadow-[0_0_20px_rgba(190,242,100,0.4)] ${sizes[size]} ${className}`}>
+      {/* Texture de fond perforée */}
+      <div className="absolute inset-0 opacity-40" style={{backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '4px 4px'}}></div>
+      
+      <div className="relative flex flex-col items-center leading-none text-center">
+        <span className="text-white font-black italic tracking-tighter text-metal" style={{ fontSize: size === 'lg' ? '2.5rem' : size === 'md' ? '1.2rem' : '0.8rem' }}>BRL</span>
+        <div className="h-[1.5px] w-full bg-[#bef264] my-1 opacity-50"></div>
+        <span className="text-white font-bold uppercase tracking-[0.1em]" style={{ fontSize: size === 'lg' ? '0.6rem' : '0.4rem' }}>
+          NÉGOCE <span className="text-[#bef264]">AUTO</span>
+        </span>
+        {size === 'lg' && (
+          <span className="text-white/60 font-bold mt-2 text-[0.5rem] tracking-widest">06 31 53 10 34</span>
+        )}
+      </div>
+    </div>
+  );
 };
 
 const INITIAL_REVIEWS = [
@@ -92,7 +122,7 @@ const INITIAL_CARS = [
 ];
 
 export default function App() {
-  const [view, setView] = useState('home'); // home, inventory, admin, detail, about, reviews
+  const [view, setView] = useState('home'); 
   const [scrolled, setScrolled] = useState(false);
   const [cars, setCars] = useState(INITIAL_CARS);
   const [reviews, setReviews] = useState(INITIAL_REVIEWS);
@@ -102,14 +132,15 @@ export default function App() {
   // Admin Auth
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPass, setAdminPass] = useState("");
-  const ADMIN_SECRET = "Brlnegoce62138!"; // Mot de passe mis à jour
+  const ADMIN_SECRET = "Brlnegoce62138!"; 
 
   const [newCar, setNewCar] = useState({
     brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", 
-    images: "", description: "", transmission: "Automatique", power: "", color: ""
+    images: [], description: "", transmission: "Automatique", power: "", color: ""
   });
 
   const [newReview, setNewReview] = useState({ author: "", text: "", rating: 5 });
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -117,17 +148,42 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // --- GESTION DES PHOTOS (GLISSER-DÉPOSER) ---
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    processFiles(files);
+  };
+
+  const processFiles = (files) => {
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewCar(prev => ({
+          ...prev,
+          images: [...prev.images, reader.result]
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index) => {
+    setNewCar(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleAddCar = (e) => {
     e.preventDefault();
-    const carImages = newCar.images.split(',').map(url => url.trim()).filter(url => url !== "");
     const carToAdd = {
       ...newCar,
       id: Date.now(),
-      images: carImages.length > 0 ? carImages : ["https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200"],
+      images: newCar.images.length > 0 ? newCar.images : ["https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200"],
       specs: { transmission: newCar.transmission, power: newCar.power, color: newCar.color, owners: "1" }
     };
     setCars([carToAdd, ...cars]);
-    setNewCar({ brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", images: "", description: "", transmission: "Automatique", power: "", color: "" });
+    setNewCar({ brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", images: [], description: "", transmission: "Automatique", power: "", color: "" });
     setView('inventory');
     window.scrollTo(0, 0);
   };
@@ -161,13 +217,14 @@ export default function App() {
       {/* --- NAVBAR --- */}
       <nav className={`fixed top-0 w-full z-[100] transition-all duration-300 px-6 py-4 ${scrolled || view !== 'home' ? 'bg-black/80 backdrop-blur-xl border-b border-white/10' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <button onClick={() => setView('home')} className="flex items-center gap-2 group">
-            <div className="relative w-10 h-10 rounded-full border-2 border-[#bef264] flex items-center justify-center bg-black overflow-hidden shadow-[0_0_15px_rgba(190,242,100,0.3)]">
-              <span className="text-white font-black italic text-sm group-hover:scale-110 transition-transform">BRL</span>
+          <button onClick={() => setView('home')} className="flex items-center gap-4 group">
+            <BRLLogo size="md" />
+            <div className="flex flex-col leading-none text-left">
+              <span className="text-white font-black italic text-xl tracking-tighter uppercase">
+                BRL <span className="text-[#bef264]">NÉGOCE</span>
+              </span>
+              <span className="text-[10px] text-white/50 font-bold tracking-[0.3em] uppercase">PREMIUM AUTO</span>
             </div>
-            <span className="text-white font-black text-xl tracking-tighter uppercase italic">
-              BRL <span className="text-[#bef264]">NÉGOCE</span>
-            </span>
           </button>
           
           <div className="hidden lg:flex items-center gap-8">
@@ -182,7 +239,7 @@ export default function App() {
             <a href={BRAND.facebookUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-white/50 hover:text-[#bef264] transition-colors">
               <Facebook size={20} />
             </a>
-            <a href={`tel:${BRAND.phone}`} className="hidden md:flex bg-[#bef264] text-black px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-white transition-all">
+            <a href={`tel:${BRAND.phone}`} className="hidden md:flex bg-[#bef264] text-black px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_15px_rgba(190,242,100,0.2)]">
               NOUS APPELER
             </a>
           </div>
@@ -198,7 +255,10 @@ export default function App() {
               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
             </div>
             <div className="max-w-7xl mx-auto w-full relative z-10">
-              <h1 className="text-5xl md:text-8xl font-black text-white leading-[1.1] mb-8 uppercase tracking-tighter">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#bef264]/10 border border-[#bef264]/20 text-[#bef264] text-[9px] font-black uppercase tracking-[0.3em] mb-6">
+                <CheckCircle2 size={12} /> Service Carte Grise Disponible
+              </div>
+              <h1 className="text-5xl md:text-8xl font-black text-white leading-[1.1] mb-8 uppercase tracking-tighter italic">
                 L'Excellence <br/>
                 <span className="text-[#bef264]">Automobile.</span>
               </h1>
@@ -206,11 +266,8 @@ export default function App() {
                 Votre partenaire de confiance à Billy-Berclau pour l'achat et la vente de véhicules premium sélectionnés.
               </p>
               <div className="flex gap-4">
-                <button onClick={() => setView('inventory')} className="bg-[#bef264] text-black px-10 py-5 rounded-lg font-black text-sm uppercase tracking-widest hover:bg-white transition-all">
-                  Découvrir le Stock
-                </button>
-                <button onClick={() => setView('about')} className="bg-white/10 backdrop-blur-md text-white px-10 py-5 rounded-lg font-black text-sm uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10">
-                  Notre Histoire
+                <button onClick={() => setView('inventory')} className="bg-[#bef264] text-black px-10 py-5 rounded-lg font-black text-sm uppercase tracking-widest hover:bg-white transition-all shadow-[0_10px_30px_rgba(190,242,100,0.3)]">
+                  DÉCOUVRIR LE STOCK
                 </button>
               </div>
             </div>
@@ -236,7 +293,7 @@ export default function App() {
                 <div key={car.id} onClick={() => openDetail(car)} className="group cursor-pointer bg-[#111] rounded-[40px] overflow-hidden border border-white/5 hover:border-[#bef264]/50 transition-all duration-500">
                   <div className="relative h-80 overflow-hidden">
                     <img src={car.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute bottom-6 right-6 bg-[#bef264] text-black px-6 py-2 rounded-xl font-black text-xl italic">{Number(car.price).toLocaleString()} €</div>
+                    <div className="absolute bottom-6 right-6 bg-[#bef264] text-black px-6 py-2 rounded-xl font-black text-xl italic shadow-xl">{Number(car.price).toLocaleString()} €</div>
                   </div>
                   <div className="p-8">
                     <p className="text-[#bef264] text-xs font-black uppercase tracking-widest mb-2">{car.brand}</p>
@@ -272,7 +329,7 @@ export default function App() {
         <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-black uppercase italic mb-4">Notre <span className="text-[#bef264]">Stock</span></h2>
-            <p className="text-slate-500 font-bold uppercase tracking-widest">Tous nos véhicules sont révisés et garantis.</p>
+            <p className="text-slate-500 font-bold uppercase tracking-widest italic">Tous nos véhicules sont révisés et garantis.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {cars.map(car => (
@@ -286,7 +343,7 @@ export default function App() {
                   <h3 className="text-2xl font-black uppercase italic mb-6">{car.model}</h3>
                   <div className="flex justify-between items-center border-t border-white/5 pt-6">
                     <span className="text-2xl font-black italic">{Number(car.price).toLocaleString()} €</span>
-                    <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-[#bef264] group-hover:text-black transition-all">
+                    <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-[#bef264] group-hover:text-black transition-all shadow-[0_0_15px_rgba(190,242,100,0.1)]">
                       <ArrowUpRight size={20} />
                     </div>
                   </div>
@@ -331,7 +388,7 @@ export default function App() {
         <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-black uppercase italic mb-4">L'Avis de nos <span className="text-[#bef264]">Clients</span></h2>
-            <p className="text-slate-500 font-bold uppercase tracking-widest">Retrouvez les témoignages de ceux qui nous ont fait confiance.</p>
+            <p className="text-slate-500 font-bold uppercase tracking-widest italic">Retrouvez les témoignages de ceux qui nous ont fait confiance.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
@@ -375,72 +432,6 @@ export default function App() {
         </section>
       )}
 
-      {/* --- VIEW: DETAIL --- */}
-      {view === 'detail' && selectedCar && (
-        <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
-          <button onClick={() => setView('inventory')} className="flex items-center gap-2 text-[#bef264] font-black uppercase text-xs mb-12 hover:translate-x-[-4px] transition-transform">
-            <ChevronLeft size={16} /> Retour au stock
-          </button>
-
-          <div className="bg-[#111] rounded-[60px] border border-white/5 overflow-hidden">
-            <div className="bg-white p-12 md:px-20 flex flex-col md:flex-row justify-between items-center gap-8">
-              <div>
-                <h2 className="text-black text-4xl md:text-6xl font-black uppercase italic leading-none">
-                  {selectedCar.brand} <br/>
-                  <span className="text-slate-400">{selectedCar.model}</span>
-                </h2>
-              </div>
-              <div className="text-black text-4xl md:text-6xl font-black italic">
-                {Number(selectedCar.price).toLocaleString()} €
-              </div>
-            </div>
-
-            <div className="p-8 md:p-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
-              <div className="space-y-6">
-                <div className="aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-black">
-                  <img src={selectedCar.images[activeImageIndex]} className="w-full h-full object-cover animate-in fade-in duration-500" />
-                </div>
-                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                  {selectedCar.images.map((img, i) => (
-                    <button key={i} onClick={() => setActiveImageIndex(i)} className={`w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all shrink-0 ${activeImageIndex === i ? 'border-[#bef264] scale-105' : 'border-transparent opacity-50'}`}>
-                      <img src={img} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-12">
-                <div className="bg-white/5 p-8 rounded-[40px] border border-white/10">
-                  <h4 className="text-[#bef264] font-black uppercase text-xs tracking-widest mb-6">Description</h4>
-                  <p className="text-slate-300 font-medium leading-relaxed italic">
-                    {selectedCar.description || "Aucune description disponible pour ce véhicule."}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { label: "Kilométrage", value: `${Number(selectedCar.km).toLocaleString()} KM`, icon: <Gauge size={16}/> },
-                    { label: "Année", value: selectedCar.year, icon: <Calendar size={16}/> },
-                    { label: "Carburant", value: selectedCar.fuel, icon: <Fuel size={16}/> },
-                    { label: "Boite", value: selectedCar.specs?.transmission || "Automatique", icon: <Settings size={16}/> },
-                  ].map((item, i) => (
-                    <div key={i} className="bg-white/5 p-6 rounded-3xl border border-white/10 flex items-center gap-4">
-                      <div className="text-[#bef264]">{item.icon}</div>
-                      <div>
-                        <p className="text-[10px] text-slate-500 font-black uppercase">{item.label}</p>
-                        <p className="text-sm font-bold">{item.value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <a href={`tel:${BRAND.phone}`} className="w-full bg-[#bef264] text-black py-6 rounded-[30px] font-black uppercase italic text-center block hover:scale-[1.02] transition-transform shadow-2xl shadow-[#bef264]/20">
-                  Réserver un essai
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* --- VIEW: ADMIN --- */}
       {view === 'admin' && (
         <section className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
@@ -456,62 +447,238 @@ export default function App() {
                   value={adminPass}
                   onChange={e => setAdminPass(e.target.value)}
                 />
-                <button type="submit" className="w-full bg-[#bef264] text-black py-4 rounded-2xl font-black uppercase italic">Se connecter</button>
+                <button type="submit" className="w-full bg-[#bef264] text-black py-4 rounded-2xl font-black uppercase italic shadow-lg shadow-[#bef264]/20">Se connecter</button>
               </form>
             </div>
           ) : (
             <div className="space-y-8">
               <div className="bg-[#111] p-12 rounded-[40px] border border-[#bef264]/30">
                 <h2 className="text-3xl font-black uppercase italic mb-10">Ajouter un <span className="text-[#bef264]">Véhicule</span></h2>
-                <form onSubmit={handleAddCar} className="space-y-6">
+                <form onSubmit={handleAddCar} className="space-y-8">
                   <div className="grid grid-cols-2 gap-6">
-                    <input required className="bg-black border border-white/10 rounded-2xl p-4 text-white" placeholder="Marque" value={newCar.brand} onChange={e => setNewCar({...newCar, brand: e.target.value})} />
-                    <input required className="bg-black border border-white/10 rounded-2xl p-4 text-white" placeholder="Modèle" value={newCar.model} onChange={e => setNewCar({...newCar, model: e.target.value})} />
-                    <input required type="number" className="bg-black border border-white/10 rounded-2xl p-4 text-white" placeholder="Prix (€)" value={newCar.price} onChange={e => setNewCar({...newCar, price: e.target.value})} />
-                    <input required type="number" className="bg-black border border-white/10 rounded-2xl p-4 text-white" placeholder="Kilométrage" value={newCar.km} onChange={e => setNewCar({...newCar, km: e.target.value})} />
-                    <input required className="bg-black border border-white/10 rounded-2xl p-4 text-white" placeholder="Année" value={newCar.year} onChange={e => setNewCar({...newCar, year: e.target.value})} />
-                    <select className="bg-black border border-white/10 rounded-2xl p-4 text-white" value={newCar.fuel} onChange={e => setNewCar({...newCar, fuel: e.target.value})}>
+                    <input required className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Marque" value={newCar.brand} onChange={e => setNewCar({...newCar, brand: e.target.value})} />
+                    <input required className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Modèle" value={newCar.model} onChange={e => setNewCar({...newCar, model: e.target.value})} />
+                    <input required type="number" className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Prix (€)" value={newCar.price} onChange={e => setNewCar({...newCar, price: e.target.value})} />
+                    <input required type="number" className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Kilométrage" value={newCar.km} onChange={e => setNewCar({...newCar, km: e.target.value})} />
+                    <input required className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Année" value={newCar.year} onChange={e => setNewCar({...newCar, year: e.target.value})} />
+                    <select className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors appearance-none" value={newCar.fuel} onChange={e => setNewCar({...newCar, fuel: e.target.value})}>
                       <option>Essence</option>
                       <option>Diesel</option>
                       <option>Hybride</option>
                       <option>Électrique</option>
                     </select>
                   </div>
-                  <input className="w-full bg-black border border-white/10 rounded-2xl p-4 text-white" placeholder="URLs des photos (séparées par des virgules)" value={newCar.images} onChange={e => setNewCar({...newCar, images: e.target.value})} />
-                  <textarea className="w-full bg-black border border-white/10 rounded-2xl p-4 text-white h-32" placeholder="Description du véhicule..." value={newCar.description} onChange={e => setNewCar({...newCar, description: e.target.value})}></textarea>
-                  <button type="submit" className="w-full bg-[#bef264] text-black py-5 rounded-2xl font-black uppercase italic">Mettre en ligne</button>
+                  
+                  {/* --- DROPZONE PHOTO --- */}
+                  <div 
+                    onClick={() => fileInputRef.current.click()}
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onDrop={(e) => { e.preventDefault(); e.stopPropagation(); processFiles(Array.from(e.dataTransfer.files)); }}
+                    className="relative border-2 border-dashed border-white/10 rounded-[40px] p-12 flex flex-col items-center justify-center gap-4 hover:border-[#bef264]/50 cursor-pointer transition-all bg-black/30 group"
+                  >
+                    <input type="file" multiple hidden ref={fileInputRef} onChange={handleFileUpload} accept="image/*" />
+                    <div className="w-20 h-20 rounded-full bg-[#bef264]/10 flex items-center justify-center text-[#bef264] group-hover:scale-110 transition-transform">
+                      <Upload size={32} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-white font-black uppercase italic tracking-widest mb-1">Glissez vos photos ici</p>
+                      <p className="text-slate-500 text-xs font-bold uppercase italic tracking-widest">Ou cliquez pour parcourir (Tous formats)</p>
+                    </div>
+                  </div>
+
+                  {/* Prévisualisation des images */}
+                  {newCar.images.length > 0 && (
+                    <div className="grid grid-cols-4 md:grid-cols-6 gap-4 p-4 bg-white/5 rounded-3xl border border-white/5">
+                      {newCar.images.map((img, i) => (
+                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-white/10 group">
+                          <img src={img} className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); removeImage(i); }} 
+                            className="absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <textarea className="w-full bg-black border border-white/10 rounded-[30px] p-6 text-white h-40 outline-none focus:border-[#bef264] transition-colors italic font-medium" placeholder="Description détaillée du véhicule..." value={newCar.description} onChange={e => setNewCar({...newCar, description: e.target.value})}></textarea>
+                  
+                  <div className="grid grid-cols-3 gap-4">
+                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs text-center outline-none focus:border-[#bef264] transition-colors" placeholder="Boite (ex: Automatique)" value={newCar.transmission} onChange={e => setNewCar({...newCar, transmission: e.target.value})} />
+                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs text-center outline-none focus:border-[#bef264] transition-colors" placeholder="Puissance (ex: 421 ch)" value={newCar.power} onChange={e => setNewCar({...newCar, power: e.target.value})} />
+                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs text-center outline-none focus:border-[#bef264] transition-colors" placeholder="Couleur" value={newCar.color} onChange={e => setNewCar({...newCar, color: e.target.value})} />
+                  </div>
+
+                  <button type="submit" className="w-full bg-[#bef264] text-black py-6 rounded-[30px] font-black uppercase italic text-xl shadow-xl shadow-[#bef264]/20 hover:scale-[1.01] transition-transform">
+                    METTRE EN LIGNE LE VÉHICULE
+                  </button>
                 </form>
+              </div>
+
+              <div className="bg-white/5 p-8 rounded-[40px] border border-white/10">
+                <h3 className="font-black uppercase mb-6 italic text-[#bef264]">Stock Actuel ({cars.length})</h3>
+                <div className="space-y-4">
+                  {cars.map(car => (
+                    <div key={car.id} className="flex items-center justify-between p-4 bg-black/50 rounded-2xl border border-white/5 group hover:border-white/10 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <img src={car.images[0]} className="w-20 h-14 object-cover rounded-xl border border-white/10" />
+                        <div>
+                          <p className="font-black italic text-sm uppercase">{car.brand} {car.model}</p>
+                          <p className="text-[#bef264] font-bold text-[10px] tracking-widest">{Number(car.price).toLocaleString()} €</p>
+                        </div>
+                      </div>
+                      <button onClick={() => { if(window.confirm("Supprimer ce véhicule ?")) setCars(cars.filter(c => c.id !== car.id)) }} className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
         </section>
       )}
 
-      {/* --- FOOTER --- */}
-      <footer className="bg-[#050505] pt-24 pb-12 px-6 border-t border-white/5">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="flex flex-col items-center gap-12">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full border-4 border-[#bef264] flex items-center justify-center bg-black">
-                <span className="text-white font-black italic text-xl">BRL</span>
+      {/* --- VIEW: DETAIL --- */}
+      {view === 'detail' && selectedCar && (
+        <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+          <button onClick={() => setView('inventory')} className="flex items-center gap-2 text-[#bef264] font-black uppercase text-xs mb-12 hover:translate-x-[-4px] transition-transform group">
+            <ChevronLeft size={16} className="group-hover:scale-110 transition-transform" /> RETOUR AU STOCK
+          </button>
+
+          <div className="bg-[#111] rounded-[60px] border border-white/5 overflow-hidden shadow-2xl">
+            <div className="bg-white p-12 md:px-20 flex flex-col md:flex-row justify-between items-center gap-8">
+              <div>
+                <h2 className="text-black text-4xl md:text-6xl font-black uppercase italic leading-none tracking-tighter">
+                  {selectedCar.brand} <br/>
+                  <span className="text-slate-400">{selectedCar.model}</span>
+                </h2>
               </div>
-              <h3 className="text-white font-black text-4xl italic uppercase">BRL <span className="text-[#bef264]">NÉGOCE</span></h3>
+              <div className="text-black text-4xl md:text-6xl font-black italic tracking-tighter">
+                {Number(selectedCar.price).toLocaleString()} €
+              </div>
             </div>
-            <div className="flex gap-8 text-[#bef264]">
-              <a href={BRAND.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:scale-125 transition-transform"><Facebook size={24} /></a>
-              <a href="#" className="hover:scale-125 transition-transform"><Instagram size={24} /></a>
-              <a href={`mailto:${BRAND.email}`} className="hover:scale-125 transition-transform"><Mail size={24} /></a>
+
+            <div className="p-8 md:p-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
+              <div className="space-y-6">
+                <div className="aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-black shadow-inner">
+                  <img src={selectedCar.images[activeImageIndex]} className="w-full h-full object-cover animate-in fade-in zoom-in duration-500" />
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                  {selectedCar.images.map((img, i) => (
+                    <button key={i} onClick={() => setActiveImageIndex(i)} className={`w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all shrink-0 ${activeImageIndex === i ? 'border-[#bef264] scale-105 shadow-lg shadow-[#bef264]/20' : 'border-transparent opacity-50'}`}>
+                      <img src={img} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-12">
+                <div className="bg-white/5 p-10 rounded-[40px] border border-white/10 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-6 opacity-5"><Info size={80} /></div>
+                  <h4 className="text-[#bef264] font-black uppercase text-xs tracking-[0.3em] mb-6 italic">Description détaillée</h4>
+                  <p className="text-slate-300 font-medium leading-relaxed italic text-lg">
+                    {selectedCar.description || "Aucune description disponible pour ce véhicule."}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: "Kilométrage", value: `${Number(selectedCar.km).toLocaleString()} KM`, icon: <Gauge size={20}/> },
+                    { label: "Année", value: selectedCar.year, icon: <Calendar size={20}/> },
+                    { label: "Carburant", value: selectedCar.fuel, icon: <Fuel size={20}/> },
+                    { label: "Boite", value: selectedCar.specs?.transmission || "Automatique", icon: <Settings size={20}/> },
+                  ].map((item, i) => (
+                    <div key={i} className="bg-white/5 p-8 rounded-[35px] border border-white/10 flex items-center gap-5 hover:border-[#bef264]/30 transition-colors group">
+                      <div className="text-[#bef264] group-hover:scale-110 transition-transform">{item.icon}</div>
+                      <div>
+                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{item.label}</p>
+                        <p className="text-lg font-black italic">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <a href={`tel:${BRAND.phone}`} className="w-full bg-[#bef264] text-black py-8 rounded-[40px] font-black uppercase italic text-xl text-center block hover:scale-[1.02] transition-all shadow-2xl shadow-[#bef264]/30">
+                  RÉSERVER UN ESSAI IMMÉDIATEMENT
+                </a>
+              </div>
             </div>
-            <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.5em]">
-              © 2026 {BRAND.name} • TOUS DROITS RÉSERVÉS
-            </p>
+          </div>
+        </section>
+      )}
+
+      {/* --- FOOTER FINAL --- */}
+      <footer className="relative bg-[#050505] pt-32 pb-12 px-6 border-t border-white/5 overflow-hidden">
+        {/* Image de fond footer intégrée intelligemment */}
+        <div className="absolute inset-0 z-0 opacity-10 grayscale hover:opacity-20 transition-opacity duration-1000">
+           <img 
+            src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&q=80&w=2000" 
+            alt="Footer Background" 
+            className="w-full h-full object-cover"
+           />
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col items-center text-center gap-12">
+            
+            <div className="flex flex-col items-center gap-6">
+              <BRLLogo size="lg" />
+              <div className="flex flex-col items-center gap-2">
+                <h3 className="text-white font-black text-5xl italic uppercase tracking-tighter leading-none">
+                  BRL <span className="text-[#bef264]">NÉGOCE AUTO</span>
+                </h3>
+                <p className="text-slate-500 font-bold uppercase tracking-[0.5em] text-[10px]">L'excellence à votre service depuis l'ouverture</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-12 text-[#bef264]">
+              <a href={BRAND.facebookUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 group">
+                <div className="p-4 rounded-full border border-[#bef264]/20 group-hover:bg-[#bef264] group-hover:text-black transition-all">
+                  <Facebook size={24} />
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-white/50 group-hover:text-white">Facebook</span>
+              </a>
+              <a href={`mailto:${BRAND.email}`} className="flex flex-col items-center gap-2 group">
+                <div className="p-4 rounded-full border border-[#bef264]/20 group-hover:bg-[#bef264] group-hover:text-black transition-all">
+                  <Mail size={24} />
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-white/50 group-hover:text-white">Email</span>
+              </a>
+              <a href={`tel:${BRAND.phone}`} className="flex flex-col items-center gap-2 group">
+                <div className="p-4 rounded-full border border-[#bef264]/20 group-hover:bg-[#bef264] group-hover:text-black transition-all">
+                  <Phone size={24} />
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-white/50 group-hover:text-white">Téléphone</span>
+              </a>
+            </div>
+
+            <div className="w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+            <div className="flex flex-col md:flex-row justify-between items-center w-full gap-8">
+              <div className="text-left space-y-2">
+                <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.5em]">
+                  © 2026 {BRAND.name} • TOUS DROITS RÉSERVÉS
+                </p>
+                <div className="flex gap-8 text-slate-800 text-[9px] font-bold uppercase tracking-widest">
+                  <a href="#" className="hover:text-white transition-colors">Mentions Légales</a>
+                  <a href="#" className="hover:text-white transition-colors">Politique de Confidentialité</a>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 text-slate-700">
+                <MapPin size={14} />
+                <span className="text-[10px] font-black uppercase tracking-widest italic">{BRAND.address}</span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
 
       {/* Floating Call Button */}
-      <a href={`tel:${BRAND.phone}`} className="fixed bottom-8 right-8 z-[110] bg-[#bef264] text-black w-16 h-16 rounded-full flex items-center justify-center shadow-2xl shadow-[#bef264]/40 hover:scale-110 transition-transform">
-        <Phone size={28} />
+      <a href={`tel:${BRAND.phone}`} className="fixed bottom-8 right-8 z-[110] bg-[#bef264] text-black w-20 h-20 rounded-full flex items-center justify-center shadow-[0_15px_40px_rgba(190,242,100,0.4)] hover:scale-110 transition-transform active:scale-95 group overflow-hidden">
+        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+        <Phone size={32} className="relative z-10" />
       </a>
     </div>
   );
