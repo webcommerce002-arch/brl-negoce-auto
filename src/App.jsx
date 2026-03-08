@@ -609,6 +609,53 @@ export default function App() {
         </section>
       )}
 
+      {/* --- WHY CHOOSE US (Global) --- */}
+      <section className="py-24 px-6 bg-[#0a0a0a] border-y border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none">
+          <div className="w-full h-full" style={{backgroundImage: 'radial-gradient(#bef264 2px, transparent 2px)', backgroundSize: '30px 30px'}}></div>
+        </div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#bef264]/10 border border-[#bef264]/20 text-[#bef264] text-[9px] font-black uppercase tracking-[0.3em] mb-8">
+              <Star size={12} fill="currentColor" /> L'EXCELLENCE DEPUIS L'OUVERTURE
+            </div>
+            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-10 leading-[0.9]">
+              Pourquoi <br/>
+              <span className="text-[#bef264]">Nous Choisir ?</span>
+            </h2>
+            <p className="text-slate-400 text-lg font-medium leading-relaxed mb-12 italic border-l-2 border-[#bef264] pl-6">
+              Service de confiance, transactions transparentes et véhicules sur lesquels vous pouvez compter.
+            </p>
+            <div className="space-y-6">
+              {[
+                { title: "Expertise Reconnue", desc: "Plus de 750 ventes réussies à notre actif avec des clients satisfaits." },
+                { title: "Garantie Totale", desc: "Tous nos véhicules sont rigoureusement révisés et garantis 3 mois." },
+                { title: "Service Carte Grise", desc: "Nous gérons toutes les démarches administratives ANTS pour vous." }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-6 p-8 bg-white/5 rounded-[30px] border border-white/10 hover:border-[#bef264]/30 transition-all group">
+                  <div className="w-14 h-14 bg-[#bef264] rounded-full flex items-center justify-center text-black shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(190,242,100,0.3)]">
+                    <CheckCircle2 size={28} />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-black uppercase italic mb-1 text-lg">{item.title}</h4>
+                    <p className="text-slate-500 text-sm font-medium italic leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="relative">
+            <div className="aspect-square rounded-[60px] overflow-hidden border border-[#bef264]/20 shadow-2xl shadow-[#bef264]/10">
+              <img src="https://images.unsplash.com/photo-1562141989-c5c79ac8f576?auto=format&fit=crop&q=80&w=1200" alt="BRL Negoce Auto" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" />
+            </div>
+            <div className="absolute -bottom-10 -left-10 bg-[#bef264] p-12 rounded-[50px] shadow-2xl shadow-[#bef264]/30 hidden md:block group hover:scale-105 transition-transform">
+              <span className="text-black font-black text-7xl italic leading-none block">10+</span>
+              <span className="text-black font-black text-xs uppercase tracking-[0.3em]">Ans d'expertise</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* --- FOOTER FINAL --- */}
       <footer className="relative bg-[#050505] pt-32 pb-12 px-6 border-t border-white/5 overflow-hidden">
         {/* Image de fond footer intégrée intelligemment */}
