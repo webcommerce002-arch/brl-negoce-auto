@@ -31,7 +31,9 @@ import {
   Settings,
   Lock,
   ArrowUpRight,
-  Info
+  Info,
+  User,
+  Quote
 } from 'lucide-react';
 
 // --- CONFIGURATION ---
@@ -49,6 +51,12 @@ const BRAND = {
   }
 };
 
+const INITIAL_REVIEWS = [
+  { id: 1, author: "Mickael B.", rating: 5, text: "Garage très sérieux, je recommande les yeux fermés. Achat d'un véhicule, tout s'est très bien passé.", date: "Il y a 2 mois" },
+  { id: 2, author: "Sandrine L.", rating: 5, text: "Très bon accueil et conseils. Ravie de mon achat, véhicule propre et révisé.", date: "Il y a 5 mois" },
+  { id: 3, author: "Kevin D.", rating: 5, text: "Sérieux et professionnel. Le service carte grise est un vrai plus !", date: "Il y a 1 mois" }
+];
+
 const INITIAL_CARS = [
   {
     id: 1,
@@ -64,12 +72,7 @@ const INITIAL_CARS = [
       "https://images.unsplash.com/photo-1554744512-d6c603f27c54?auto=format&fit=crop&q=80&w=1200"
     ],
     description: "Une performance exceptionnelle rencontrant un luxe inégalé. Ce modèle AMG est équipé de toutes les dernières technologies Mercedes, incluant le MBUX et une transmission 4Matic+ ultra-réactive. État clinique, première main.",
-    specs: {
-      transmission: "Automatique",
-      power: "421 ch",
-      color: "Noir Cosmos",
-      owners: "1"
-    }
+    specs: { transmission: "Automatique", power: "421 ch", color: "Noir Cosmos", owners: "1" }
   },
   {
     id: 2,
@@ -84,30 +87,29 @@ const INITIAL_CARS = [
       "https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&q=80&w=1200"
     ],
     description: "La Golf R est l'aboutissement de la polyvalence. Sportive le week-end, confortable la semaine. Équipée de l'échappement Akrapovic optionnel et du pack Performance.",
-    specs: {
-      transmission: "DSG7",
-      power: "320 ch",
-      color: "Bleu Lapiz",
-      owners: "1"
-    }
+    specs: { transmission: "DSG7", power: "320 ch", color: "Bleu Lapiz", owners: "1" }
   }
 ];
 
 export default function App() {
-  const [view, setView] = useState('home'); // home, inventory, admin, detail
+  const [view, setView] = useState('home'); // home, inventory, admin, detail, about, reviews
   const [scrolled, setScrolled] = useState(false);
   const [cars, setCars] = useState(INITIAL_CARS);
+  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
   const [selectedCar, setSelectedCar] = useState(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   
-  // Admin Auth Mock
+  // Admin Auth
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminPass, setAdminPass] = useState("");
+  const ADMIN_SECRET = "1234"; // Vous pouvez changer le mot de passe ici
 
   const [newCar, setNewCar] = useState({
     brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", 
     images: "", description: "", transmission: "Automatique", power: "", color: ""
   });
+
+  const [newReview, setNewReview] = useState({ author: "", text: "", rating: 5 });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -122,17 +124,19 @@ export default function App() {
       ...newCar,
       id: Date.now(),
       images: carImages.length > 0 ? carImages : ["https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200"],
-      specs: {
-        transmission: newCar.transmission,
-        power: newCar.power,
-        color: newCar.color,
-        owners: "1"
-      }
+      specs: { transmission: newCar.transmission, power: newCar.power, color: newCar.color, owners: "1" }
     };
     setCars([carToAdd, ...cars]);
     setNewCar({ brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", images: "", description: "", transmission: "Automatique", power: "", color: "" });
     setView('inventory');
     window.scrollTo(0, 0);
+  };
+
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    const reviewToAdd = { ...newReview, id: Date.now(), date: "À l'instant" };
+    setReviews([reviewToAdd, ...reviews]);
+    setNewReview({ author: "", text: "", rating: 5 });
   };
 
   const openDetail = (car) => {
@@ -144,7 +148,7 @@ export default function App() {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    if(adminPass === "1234") { // Mock password
+    if(adminPass === ADMIN_SECRET) {
       setIsAdmin(true);
     } else {
       alert("Mot de passe incorrect");
@@ -152,10 +156,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-[#bef264] selection:text-black font-sans pb-20">
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-[#bef264] selection:text-black font-sans pb-20 custom-scrollbar">
       
       {/* --- NAVBAR --- */}
-      <nav className={`fixed top-0 w-full z-[100] transition-all duration-300 px-6 py-4 ${scrolled || view !== 'home' ? 'bg-black/90 backdrop-blur-md border-b border-white/10' : 'bg-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-[100] transition-all duration-300 px-6 py-4 ${scrolled || view !== 'home' ? 'bg-black/80 backdrop-blur-xl border-b border-white/10' : 'bg-transparent'}`}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <button onClick={() => setView('home')} className="flex items-center gap-2 group">
             <div className="relative w-10 h-10 rounded-full border-2 border-[#bef264] flex items-center justify-center bg-black overflow-hidden shadow-[0_0_15px_rgba(190,242,100,0.3)]">
@@ -169,12 +173,19 @@ export default function App() {
           <div className="hidden lg:flex items-center gap-8">
             <button onClick={() => setView('home')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'home' ? 'text-[#bef264]' : 'text-white'}`}>Accueil</button>
             <button onClick={() => setView('inventory')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'inventory' ? 'text-[#bef264]' : 'text-white'}`}>Inventaire</button>
+            <button onClick={() => setView('about')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'about' ? 'text-[#bef264]' : 'text-white'}`}>À Propos</button>
+            <button onClick={() => setView('reviews')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'reviews' ? 'text-[#bef264]' : 'text-white'}`}>Avis</button>
             <button onClick={() => setView('admin')} className={`text-white/30 hover:text-white transition-colors ${view === 'admin' ? 'text-[#bef264]' : ''}`}><Lock size={18} /></button>
           </div>
 
-          <a href={`tel:${BRAND.phone}`} className="hidden md:flex bg-[#bef264] text-black px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-white transition-all">
-            Nous Appeler
-          </a>
+          <div className="flex items-center gap-4">
+            <a href={BRAND.facebookUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-white/50 hover:text-[#bef264] transition-colors">
+              <Facebook size={20} />
+            </a>
+            <a href={`tel:${BRAND.phone}`} className="hidden md:flex bg-[#bef264] text-black px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-white transition-all">
+              NOUS APPELER
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -197,6 +208,9 @@ export default function App() {
               <div className="flex gap-4">
                 <button onClick={() => setView('inventory')} className="bg-[#bef264] text-black px-10 py-5 rounded-lg font-black text-sm uppercase tracking-widest hover:bg-white transition-all">
                   Découvrir le Stock
+                </button>
+                <button onClick={() => setView('about')} className="bg-white/10 backdrop-blur-md text-white px-10 py-5 rounded-lg font-black text-sm uppercase tracking-widest hover:bg-white/20 transition-all border border-white/10">
+                  Notre Histoire
                 </button>
               </div>
             </div>
@@ -283,6 +297,84 @@ export default function App() {
         </section>
       )}
 
+      {/* --- VIEW: ABOUT --- */}
+      {view === 'about' && (
+        <section className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
+          <div className="bg-[#111] rounded-[60px] border border-white/5 p-12 md:p-20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-10 opacity-5">
+              <Quote size={200} className="text-[#bef264]" />
+            </div>
+            <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-12 leading-none relative z-10">
+              Notre <span className="text-[#bef264]">Histoire</span>
+            </h2>
+            <div className="space-y-8 text-slate-300 text-lg md:text-xl font-medium leading-relaxed italic relative z-10">
+              <p>
+                Depuis l'ouverture de <span className="text-white font-black">BRL NÉGOCE AUTO</span>, notre mission première n'a jamais changé : satisfaire nos clients en leur proposant une expérience d'achat transparente et sereine.
+              </p>
+              <p>
+                Passionnés par l'automobile, nous sélectionnons chaque véhicule de notre parc avec la plus grande rigueur. Chaque voiture est minutieusement inspectée, révisée et préparée pour garantir votre sécurité et votre plaisir de conduire.
+              </p>
+              <p>
+                Nous croyons qu'un achat automobile est avant tout une relation de confiance. C'est pourquoi nous vous accompagnons à chaque étape, du choix de votre véhicule aux démarches administratives de carte grise, pour que vous n'ayez qu'une chose à faire : profiter de votre nouvelle route.
+              </p>
+              <div className="pt-8 flex items-center gap-4 text-[#bef264]">
+                <div className="h-[2px] w-20 bg-[#bef264]"></div>
+                <span className="uppercase font-black tracking-widest text-sm italic">L'Équipe BRL NÉGOCE AUTO</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* --- VIEW: REVIEWS --- */}
+      {view === 'reviews' && (
+        <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-black uppercase italic mb-4">L'Avis de nos <span className="text-[#bef264]">Clients</span></h2>
+            <p className="text-slate-500 font-bold uppercase tracking-widest">Retrouvez les témoignages de ceux qui nous ont fait confiance.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+            {reviews.map(review => (
+              <div key={review.id} className="bg-[#111] p-10 rounded-[40px] border border-white/5 relative group hover:border-[#bef264]/30 transition-all">
+                <div className="flex gap-1 text-[#bef264] mb-6">
+                  {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                </div>
+                <p className="text-white font-medium italic mb-8 leading-relaxed">"{review.text}"</p>
+                <div className="flex items-center gap-4 border-t border-white/5 pt-8">
+                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[#bef264]">
+                    <User size={24} />
+                  </div>
+                  <div>
+                    <h4 className="font-black uppercase italic text-sm">{review.author}</h4>
+                    <p className="text-slate-500 text-[10px] font-bold uppercase">{review.date}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white p-12 md:p-20 rounded-[60px]">
+            <h3 className="text-black text-3xl font-black uppercase italic mb-10 text-center">Laissez-nous <span className="text-slate-400">votre avis</span></h3>
+            <form onSubmit={handleAddReview} className="max-w-2xl mx-auto space-y-6">
+              <input required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre Nom" value={newReview.author} onChange={e => setNewReview({...newReview, author: e.target.value})} />
+              <textarea required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black h-32 placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre message..." value={newReview.text} onChange={e => setNewReview({...newReview, text: e.target.value})}></textarea>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500 font-bold uppercase text-xs">Note :</span>
+                  {[1,2,3,4,5].map(star => (
+                    <button key={star} type="button" onClick={() => setNewReview({...newReview, rating: star})} className={`transition-transform hover:scale-125 ${newReview.rating >= star ? 'text-[#bef264]' : 'text-slate-300'}`}>
+                      <Star size={24} fill={newReview.rating >= star ? "currentColor" : "none"} />
+                    </button>
+                  ))}
+                </div>
+                <button type="submit" className="bg-black text-white px-8 py-4 rounded-xl font-black uppercase italic hover:bg-[#bef264] hover:text-black transition-all">Envoyer</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      )}
+
       {/* --- VIEW: DETAIL --- */}
       {view === 'detail' && selectedCar && (
         <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
@@ -291,7 +383,6 @@ export default function App() {
           </button>
 
           <div className="bg-[#111] rounded-[60px] border border-white/5 overflow-hidden">
-            {/* Header Detail */}
             <div className="bg-white p-12 md:px-20 flex flex-col md:flex-row justify-between items-center gap-8">
               <div>
                 <h2 className="text-black text-4xl md:text-6xl font-black uppercase italic leading-none">
@@ -305,7 +396,6 @@ export default function App() {
             </div>
 
             <div className="p-8 md:p-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
-              {/* Gallery */}
               <div className="space-y-6">
                 <div className="aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-black">
                   <img src={selectedCar.images[activeImageIndex]} className="w-full h-full object-cover animate-in fade-in duration-500" />
@@ -319,7 +409,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Info */}
               <div className="space-y-12">
                 <div className="bg-white/5 p-8 rounded-[40px] border border-white/10">
                   <h4 className="text-[#bef264] font-black uppercase text-xs tracking-widest mb-6">Description</h4>
@@ -327,7 +416,6 @@ export default function App() {
                     {selectedCar.description || "Aucune description disponible pour ce véhicule."}
                   </p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     { label: "Kilométrage", value: `${Number(selectedCar.km).toLocaleString()} KM`, icon: <Gauge size={16}/> },
@@ -344,33 +432,10 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-
                 <a href={`tel:${BRAND.phone}`} className="w-full bg-[#bef264] text-black py-6 rounded-[30px] font-black uppercase italic text-center block hover:scale-[1.02] transition-transform shadow-2xl shadow-[#bef264]/20">
                   Réserver un essai
                 </a>
               </div>
-            </div>
-
-            {/* Table Detail Bottom */}
-            <div className="bg-black/40 border-t border-white/10 p-12 md:px-20">
-               <h3 className="text-white font-black uppercase italic mb-8 flex items-center gap-3">
-                 <Info size={20} className="text-[#bef264]" /> Caractéristiques Techniques
-               </h3>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
-                  {[
-                    { label: "Type de véhicule", value: "Occasion" },
-                    { label: "État", value: "Excellent" },
-                    { label: "Puissance", value: selectedCar.specs?.power || "N/C" },
-                    { label: "Couleur", value: selectedCar.specs?.color || "N/C" },
-                    { label: "Propriétaires", value: selectedCar.specs?.owners || "1" },
-                    { label: "Garantie", value: "3 Mois incluse" }
-                  ].map((spec, i) => (
-                    <div key={i} className="flex justify-between py-4 border-b border-white/5 text-sm uppercase font-bold tracking-widest">
-                      <span className="text-slate-500">{spec.label}</span>
-                      <span>{spec.value}</span>
-                    </div>
-                  ))}
-               </div>
             </div>
           </div>
         </section>
@@ -414,82 +479,13 @@ export default function App() {
                   </div>
                   <input className="w-full bg-black border border-white/10 rounded-2xl p-4 text-white" placeholder="URLs des photos (séparées par des virgules)" value={newCar.images} onChange={e => setNewCar({...newCar, images: e.target.value})} />
                   <textarea className="w-full bg-black border border-white/10 rounded-2xl p-4 text-white h-32" placeholder="Description du véhicule..." value={newCar.description} onChange={e => setNewCar({...newCar, description: e.target.value})}></textarea>
-                  
-                  <div className="grid grid-cols-3 gap-4">
-                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs" placeholder="Boite (ex: Auto)" value={newCar.transmission} onChange={e => setNewCar({...newCar, transmission: e.target.value})} />
-                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs" placeholder="Puissance (ex: 400ch)" value={newCar.power} onChange={e => setNewCar({...newCar, power: e.target.value})} />
-                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs" placeholder="Couleur" value={newCar.color} onChange={e => setNewCar({...newCar, color: e.target.value})} />
-                  </div>
-
-                  <button type="submit" className="w-full bg-[#bef264] text-black py-5 rounded-2xl font-black uppercase italic shadow-lg shadow-[#bef264]/20">Mettre en ligne</button>
+                  <button type="submit" className="w-full bg-[#bef264] text-black py-5 rounded-2xl font-black uppercase italic">Mettre en ligne</button>
                 </form>
-              </div>
-
-              <div className="bg-white/5 p-8 rounded-[40px] border border-white/10">
-                <h3 className="font-black uppercase mb-6 italic">Gérer le stock ({cars.length})</h3>
-                <div className="space-y-4">
-                  {cars.map(car => (
-                    <div key={car.id} className="flex items-center justify-between p-4 bg-black/50 rounded-2xl border border-white/5">
-                      <div className="flex items-center gap-4">
-                        <img src={car.images[0]} className="w-16 h-12 object-cover rounded-xl" />
-                        <div>
-                          <p className="font-black italic text-sm">{car.brand} {car.model}</p>
-                          <p className="text-[#bef264] font-bold text-xs">{Number(car.price).toLocaleString()} €</p>
-                        </div>
-                      </div>
-                      <button onClick={() => { if(window.confirm("Supprimer ?")) setCars(cars.filter(c => c.id !== car.id)) }} className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-colors">
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           )}
         </section>
       )}
-
-      {/* --- MAP SECTION --- */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="bg-[#111] rounded-[60px] border border-white/5 overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            <div className="p-12 md:p-20">
-              <h2 className="text-5xl font-black uppercase italic mb-8">Nous <span className="text-[#bef264]">Trouver</span></h2>
-              <div className="space-y-8">
-                <div className="flex items-start gap-6">
-                  <div className="bg-[#bef264] text-black p-4 rounded-2xl"><MapPin size={24} /></div>
-                  <div>
-                    <h4 className="font-black uppercase italic text-lg mb-2">Notre Garage</h4>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                      {BRAND.address} <br/> Billy-Berclau, France
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-6">
-                  <div className="bg-[#bef264] text-black p-4 rounded-2xl"><Phone size={24} /></div>
-                  <div>
-                    <h4 className="font-black uppercase italic text-lg mb-2">Contact Direct</h4>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest">{BRAND.phone}</p>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest">{BRAND.email}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Google Maps Embed */}
-            <div className="h-[400px] lg:h-auto border-l border-white/10 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2537.915124673641!2d2.856980577030807!3d50.49853997159781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47dd395493064e43%3A0x6b1f2e96d9365611!2s6%20Rue%20Jules%20Ferry%2C%2062138%20Billy-Berclau!5e0!3m2!1sfr!2sfr!4v1710123456789!5m2!1sfr!2sfr" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                allowFullScreen="" 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade">
-              </iframe>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* --- FOOTER --- */}
       <footer className="bg-[#050505] pt-24 pb-12 px-6 border-t border-white/5">
@@ -501,24 +497,14 @@ export default function App() {
               </div>
               <h3 className="text-white font-black text-4xl italic uppercase">BRL <span className="text-[#bef264]">NÉGOCE</span></h3>
             </div>
-            
             <div className="flex gap-8 text-[#bef264]">
-              <a href={BRAND.facebookUrl} className="hover:scale-125 transition-transform"><Facebook size={24} /></a>
+              <a href={BRAND.facebookUrl} target="_blank" rel="noopener noreferrer" className="hover:scale-125 transition-transform"><Facebook size={24} /></a>
               <a href="#" className="hover:scale-125 transition-transform"><Instagram size={24} /></a>
               <a href={`mailto:${BRAND.email}`} className="hover:scale-125 transition-transform"><Mail size={24} /></a>
             </div>
-
-            <div className="w-full h-[1px] bg-white/5"></div>
-
-            <div className="flex flex-col md:flex-row justify-between items-center w-full gap-6">
-              <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.5em]">
-                © 2026 {BRAND.name} • TOUS DROITS RÉSERVÉS
-              </p>
-              <div className="flex gap-8 text-slate-700 text-[10px] font-black uppercase tracking-[0.2em]">
-                <a href="#" className="hover:text-white transition-colors">Mentions Légales</a>
-                <a href="#" className="hover:text-white transition-colors">Confidentialité</a>
-              </div>
-            </div>
+            <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.5em]">
+              © 2026 {BRAND.name} • TOUS DROITS RÉSERVÉS
+            </p>
           </div>
         </div>
       </footer>
