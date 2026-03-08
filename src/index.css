@@ -52,6 +52,10 @@
   border-radius: 10px;
 }
 
+.text-stroke-black {
+  -webkit-text-stroke: 0.5px black;
+}
+
 .metal-gradient {
   background: linear-gradient(145deg, #333, #111);
 }

@@ -277,13 +277,13 @@ export default function App() {
               </div>
             </div>
             
-            <div className="absolute bottom-0 left-0 w-full bg-[#bef264] py-8 overflow-hidden hidden md:block">
-              <div className="flex justify-center items-center gap-12 animate-infinite-scroll whitespace-nowrap text-black font-black text-xl uppercase italic">
-                {[1,2,3,4,5].map(i => (
+            <div className="absolute bottom-0 left-0 w-full bg-white py-4 overflow-hidden hidden md:block border-t border-white/10 shadow-[0_-10px_30px_rgba(255,255,255,0.05)]">
+              <div className="flex justify-center items-center gap-12 animate-infinite-scroll whitespace-nowrap text-[#bef264] font-black text-lg uppercase italic text-stroke-black">
+                {[1,2,3,4,5,6,7,8].map(i => (
                   <div key={i} className="flex items-center gap-12">
-                    <span>Transparence Totale</span> <div className="w-2 h-2 bg-black rounded-full"></div>
-                    <span>Prix Justes</span> <div className="w-2 h-2 bg-black rounded-full"></div>
-                    <span>Garantie 3 Mois</span> <div className="w-2 h-2 bg-black rounded-full"></div>
+                    <span>Transparence Totale</span> <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
+                    <span>Prix Justes</span> <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
+                    <span>Garantie 3 Mois</span> <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
                   </div>
                 ))}
               </div>
