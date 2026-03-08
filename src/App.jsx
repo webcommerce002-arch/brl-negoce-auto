@@ -326,6 +326,59 @@ export default function App() {
               ))}
             </div>
           </section>
+
+          {/* --- REVIEWS SECTION ON HOME --- */}
+          <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl font-black uppercase italic mb-4">L'Avis de nos <span className="text-[#bef264]">Clients</span></h2>
+              <div className="flex items-center justify-center gap-4 mb-4">
+                 <div className="flex gap-1 text-[#bef264]">
+                   {[1,2,3,4,5].map(i => <Star key={i} size={20} fill="currentColor" />)}
+                 </div>
+                 <span className="text-2xl font-black italic">{BRAND.rating}/5</span>
+              </div>
+              <p className="text-slate-500 font-bold uppercase tracking-widest italic">Retrouvez les témoignages de ceux qui nous ont fait confiance.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+              {reviews.map(review => (
+                <div key={review.id} className="bg-[#111] p-10 rounded-[40px] border border-white/5 relative group hover:border-[#bef264]/30 transition-all">
+                  <div className="flex gap-1 text-[#bef264] mb-6">
+                    {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                  </div>
+                  <p className="text-white font-medium italic mb-8 leading-relaxed">"{review.text}"</p>
+                  <div className="flex items-center gap-4 border-t border-white/5 pt-8">
+                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[#bef264]">
+                      <User size={24} />
+                    </div>
+                    <div>
+                      <h4 className="font-black uppercase italic text-sm">{review.author}</h4>
+                      <p className="text-slate-500 text-[10px] font-bold uppercase">{review.date}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white p-12 md:p-20 rounded-[60px]">
+              <h3 className="text-black text-3xl font-black uppercase italic mb-10 text-center">Laissez-nous <span className="text-slate-400">votre avis</span></h3>
+              <form onSubmit={handleAddReview} className="max-w-2xl mx-auto space-y-6">
+                <input required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre Nom" value={newReview.author} onChange={e => setNewReview({...newReview, author: e.target.value})} />
+                <textarea required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black h-32 placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre message..." value={newReview.text} onChange={e => setNewReview({...newReview, text: e.target.value})}></textarea>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-500 font-bold uppercase text-xs">Note :</span>
+                    {[1,2,3,4,5].map(star => (
+                      <button key={star} type="button" onClick={() => setNewReview({...newReview, rating: star})} className={`transition-transform hover:scale-125 ${newReview.rating >= star ? 'text-[#bef264]' : 'text-slate-300'}`}>
+                        <Star size={24} fill={newReview.rating >= star ? "currentColor" : "none"} />
+                      </button>
+                    ))}
+                  </div>
+                  <button type="submit" className="bg-black text-white px-8 py-4 rounded-xl font-black uppercase italic hover:bg-[#bef264] hover:text-black transition-all">Envoyer</button>
+                </div>
+              </form>
+            </div>
+          </section>
         </>
       )}
 
