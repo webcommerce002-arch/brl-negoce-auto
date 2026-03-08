@@ -90,34 +90,33 @@ const INITIAL_REVIEWS = [
 const INITIAL_CARS = [
   {
     id: 1,
-    brand: "MERCEDES-BENZ",
-    model: "CLASSE A 45 S AMG",
-    year: "2023",
-    price: "68900",
-    km: "12500",
+    brand: "CITROËN",
+    model: "C3 1.1 60CH 5P",
+    year: "2011",
+    price: "6290",
+    km: "81275",
     fuel: "Essence",
     images: [
-      "https://images.unsplash.com/photo-1617650728468-807eb271b467?auto=format&fit=crop&q=80&w=1200",
-      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
-      "https://images.unsplash.com/photo-1554744512-d6c603f27c54?auto=format&fit=crop&q=80&w=1200"
+      "https://images.unsplash.com/photo-1621236304191-f9259837a57a?auto=format&fit=crop&q=80&w=1200", // Citroen C3 Blue Style
+      "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80&w=1200"
     ],
-    description: "Une performance exceptionnelle rencontrant un luxe inégalé. Ce modèle AMG est équipé de toutes les dernières technologies Mercedes, incluant le MBUX et une transmission 4Matic+ ultra-réactive. État clinique, première main.",
-    specs: { transmission: "Automatique", power: "421 ch", color: "Noir Cosmos", owners: "1" }
+    description: "SAS BRL NEGOCE AUTO propose cette magnifique Citroën C3 1.1 (60 ch). Distribution neuve, mécanique fiable et économique. Contrôle Technique OK (2 ans), Vidange neuve, Disques/plaquettes avant neufs, Triangles neufs. Options : Radio CD, Ordinateur de bord, Sièges/Volant réglables, Banquette 2/3 1/3, Airbags, ABS, ESP, Isofix, Carnet d'entretien.",
+    specs: { transmission: "Manuelle", power: "60 ch", color: "Bleu", owners: "2" }
   },
   {
     id: 2,
-    brand: "VOLKSWAGEN",
-    model: "GOLF 8 R",
-    year: "2022",
-    price: "52500",
-    km: "21000",
+    brand: "RENAULT",
+    model: "TWINGO 1.2 16V 75CH",
+    year: "2014",
+    price: "3490",
+    km: "197000",
     fuel: "Essence",
     images: [
-      "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200",
-      "https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&q=80&w=1200"
+      "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200", // Twingo Style
+      "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=1200"
     ],
-    description: "La Golf R est l'aboutissement de la polyvalence. Sportive le week-end, confortable la semaine. Équipée de l'échappement Akrapovic optionnel et du pack Performance.",
-    specs: { transmission: "DSG7", power: "320 ch", color: "Bleu Lapiz", owners: "1" }
+    description: "Note importante : Compteur affichant 113.000km mais réel estimé à 197.000km (compteur remplacé). Prix ajusté en conséquence. Toit ouvrant, Distribution OK (2022), Embrayage OK (2022), Vidange neuve. Options : Vitres électriques, Radio CD, Centralisation, Airbags, ABS.",
+    specs: { transmission: "Manuelle", power: "75 ch", color: "Gris", owners: "2" }
   }
 ];
 
