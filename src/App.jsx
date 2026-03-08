@@ -232,6 +232,24 @@ export default function App() {
               ))}
             </div>
           </section>
+
+          {/* Services Section */}
+          <section className="py-24 px-6 bg-black/50 border-y border-white/5">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                { icon: <ShieldCheck size={32} />, title: "Garantie 3 Mois", desc: "Révisés et garantis, extension possible." },
+                { icon: <Award size={32} />, title: "Gestion ANTS", desc: "Accompagnement pour votre carte grise." },
+                { icon: <Zap size={32} />, title: "750+ Ventes", desc: "Une expertise prouvée par nos clients." },
+                { icon: <Handshake size={32} />, title: "Dépôt-Vente", desc: "Confiez-nous votre véhicule en toute sécurité." }
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col items-center text-center p-10 rounded-[40px] bg-[#111] border border-white/5 hover:border-[#bef264]/30 transition-all group">
+                  <div className="text-[#bef264] mb-6 group-hover:scale-110 transition-transform">{item.icon}</div>
+                  <h4 className="text-white font-black uppercase italic mb-3 tracking-tighter text-lg">{item.title}</h4>
+                  <p className="text-slate-500 text-sm font-medium italic leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
         </>
       )}
 
