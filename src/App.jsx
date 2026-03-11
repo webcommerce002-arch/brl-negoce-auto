@@ -58,13 +58,14 @@ const BRAND = {
 };
 
 const COLORS = {
-  primary: "#1e3a5f",
-  accent: "#e63946",
-  white: "#ffffff",
-  lightGray: "#f8f9fa",
-  darkText: "#1a1a2e",
-  grayText: "#6b7280",
-  border: "#e5e7eb"
+  primary: "#bef264",
+  accent: "#bef264",
+  dark: "#0a0a0a",
+  darker: "#111111",
+  lightSection: "#111111",
+  darkText: "#ffffff",
+  grayText: "#94a3b8",
+  border: "rgba(255,255,255,0.1)"
 };
 
 // --- MANUFACTURER SPECS ---
@@ -229,17 +230,17 @@ const Navbar = ({ currentPage, setCurrentPage, setShowAdmin }) => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-black/95 backdrop-blur-md shadow-lg' : 'bg-[#0a0a0a]'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <button onClick={() => navigate('home')} className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] flex items-center justify-center">
-              <Car size={22} className="text-white" />
+            <div className="w-10 h-10 rounded-xl bg-[#bef264] flex items-center justify-center">
+              <Car size={22} className="text-black" />
             </div>
             <div className="leading-tight">
-              <span className="text-xl font-extrabold text-[#1e3a5f] tracking-tight">BRL</span>
-              <span className="block text-[10px] font-semibold text-gray-500 tracking-widest uppercase">Negoce Auto</span>
+              <span className="text-xl font-extrabold text-[#bef264] tracking-tight">BRL</span>
+              <span className="block text-[10px] font-semibold text-slate-400 tracking-widest uppercase">Negoce Auto</span>
             </div>
           </button>
 
@@ -251,8 +252,8 @@ const Navbar = ({ currentPage, setCurrentPage, setShowAdmin }) => {
                 onClick={() => navigate(link.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   currentPage === link.id
-                    ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]'
-                    : 'text-gray-600 hover:text-[#1e3a5f] hover:bg-gray-100'
+                    ? 'bg-[#bef264]/10 text-[#bef264]'
+                    : 'text-gray-300 hover:text-[#bef264] hover:bg-white/10'
                 }`}
               >
                 {link.label}
@@ -262,16 +263,16 @@ const Navbar = ({ currentPage, setCurrentPage, setShowAdmin }) => {
 
           {/* Right side */}
           <div className="hidden md:flex items-center gap-3">
-            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e3a5f] transition-colors">
+            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 text-sm text-gray-300 hover:text-[#bef264] transition-colors">
               <Phone size={16} />
               <span className="font-medium">{BRAND.phone}</span>
             </a>
-            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="bg-[#e63946] hover:bg-[#d62839] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-red-200">
+            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-[#bef264]/20">
               Nous appeler
             </a>
             <button
               onClick={() => { setShowAdmin(true); setCurrentPage('admin'); setMobileOpen(false); }}
-              className="p-2 rounded-lg text-gray-400 hover:text-[#1e3a5f] hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg text-slate-500 hover:text-[#bef264] hover:bg-white/10 transition-colors"
               title="Admin"
             >
               <Lock size={16} />
@@ -279,34 +280,34 @@ const Navbar = ({ currentPage, setCurrentPage, setShowAdmin }) => {
           </div>
 
           {/* Mobile hamburger */}
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100">
-            {mobileOpen ? <X size={24} className="text-gray-700" /> : <Menu size={24} className="text-gray-700" />}
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg hover:bg-white/10">
+            {mobileOpen ? <X size={24} className="text-slate-200" /> : <Menu size={24} className="text-slate-200" />}
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-xl">
+        <div className="md:hidden bg-[#0a0a0a] border-t border-white/10 shadow-xl">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map(link => (
               <button
                 key={link.id}
                 onClick={() => navigate(link.id)}
                 className={`block w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                  currentPage === link.id ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'text-gray-600 hover:bg-gray-50'
+                  currentPage === link.id ? 'bg-[#bef264]/10 text-[#bef264]' : 'text-gray-300 hover:bg-white/5'
                 }`}
               >
                 {link.label}
               </button>
             ))}
             <hr className="my-2" />
-            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 px-4 py-3 text-[#e63946] font-semibold text-sm">
+            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 px-4 py-3 text-[#bef264] font-semibold text-sm">
               <Phone size={16} /> {BRAND.phone}
             </a>
             <button
               onClick={() => { setShowAdmin(true); setCurrentPage('admin'); setMobileOpen(false); }}
-              className="flex items-center gap-2 px-4 py-3 text-gray-400 text-sm"
+              className="flex items-center gap-2 px-4 py-3 text-slate-500 text-sm"
             >
               <Lock size={14} /> Administration
             </button>
@@ -321,32 +322,32 @@ const Navbar = ({ currentPage, setCurrentPage, setShowAdmin }) => {
 // HERO
 // =============================================================================
 const HeroSection = ({ setCurrentPage }) => (
-  <section className="pt-24 lg:pt-32 pb-16 lg:pb-24 bg-white">
+  <section className="pt-24 lg:pt-32 pb-16 lg:pb-24 bg-[#0a0a0a]">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
         <RevealSection>
           <div>
-            <div className="inline-flex items-center gap-2 bg-[#1e3a5f]/10 text-[#1e3a5f] px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#bef264]/10 text-[#bef264] px-4 py-2 rounded-full text-sm font-medium mb-6">
               <ShieldCheck size={16} />
               Garage de confiance depuis des annees
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1a1a2e] leading-tight mb-6">
-              Votre partenaire <span className="text-[#e63946]">auto</span> de confiance a{' '}
-              <span className="text-[#1e3a5f]">Billy-Berclau</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+              Votre partenaire <span className="text-[#bef264]">auto</span> de confiance a{' '}
+              <span className="text-[#bef264]">Billy-Berclau</span>
             </h1>
-            <p className="text-lg text-gray-500 mb-8 max-w-lg">
+            <p className="text-lg text-slate-400 mb-8 max-w-lg">
               Des vehicules d'occasion selectionnes, revises et garantis. Transparence, qualite et prix justes.
             </p>
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => { setCurrentPage('stock'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                className="bg-[#e63946] hover:bg-[#d62839] text-white px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 hover:shadow-xl hover:shadow-red-200 flex items-center gap-2"
+                className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 hover:shadow-xl hover:shadow-[#bef264]/20 flex items-center gap-2"
               >
                 Voir nos vehicules <ArrowRight size={18} />
               </button>
               <a
                 href={BRAND.phoneLink}
-                className="border-2 border-[#1e3a5f] text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 flex items-center gap-2"
+                className="border-2 border-white/20 text-[#bef264] hover:bg-[#bef264] hover:text-black px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 flex items-center gap-2"
               >
                 <Phone size={18} /> Nous appeler
               </a>
@@ -355,20 +356,20 @@ const HeroSection = ({ setCurrentPage }) => (
         </RevealSection>
         <RevealSection delay={200}>
           <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-[#1e3a5f]/20 to-[#e63946]/20 rounded-3xl blur-2xl"></div>
+            <div className="absolute -inset-4 bg-gradient-to-r from-[#bef264]/20 to-[#bef264]/10 rounded-3xl blur-2xl"></div>
             <img
               src="https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop"
               alt="Voiture d'occasion BRL Negoce Auto"
               className="relative rounded-3xl shadow-2xl w-full object-cover aspect-[4/3]"
             />
-            <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between">
+            <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">A partir de</p>
-                <p className="text-2xl font-extrabold text-[#1e3a5f]">3 490 EUR</p>
+                <p className="text-sm text-slate-400">A partir de</p>
+                <p className="text-2xl font-extrabold text-[#bef264]">3 490 EUR</p>
               </div>
               <div className="flex items-center gap-1 text-yellow-500">
                 <Star size={18} className="fill-yellow-400" />
-                <span className="font-bold text-gray-800">{BRAND.rating}/5</span>
+                <span className="font-bold text-white">{BRAND.rating}/5</span>
               </div>
             </div>
           </div>
@@ -390,16 +391,16 @@ const StatsBand = () => {
   ];
 
   return (
-    <section className="bg-[#1e3a5f] py-8">
+    <section className="bg-[#bef264] py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {stats.map((s, i) => (
             <RevealSection key={i} delay={i * 100}>
-              <div className="flex items-center gap-4 text-white">
-                <div className="p-3 bg-white/10 rounded-xl">{s.icon}</div>
+              <div className="flex items-center gap-4 text-black">
+                <div className="p-3 bg-black/10 rounded-xl">{s.icon}</div>
                 <div>
                   <p className="text-2xl font-extrabold">{s.value}</p>
-                  <p className="text-sm text-white/70">{s.label}</p>
+                  <p className="text-sm text-black/60">{s.label}</p>
                 </div>
               </div>
             </RevealSection>
@@ -416,7 +417,7 @@ const StatsBand = () => {
 const CarCard = ({ car, onClick }) => (
   <div
     onClick={onClick}
-    className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
+    className="group bg-[#1a1a1a] rounded-2xl border border-white/10 overflow-hidden shadow-none hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
   >
     <div className="relative overflow-hidden aspect-[4/3]">
       <img
@@ -424,25 +425,25 @@ const CarCard = ({ car, onClick }) => (
         alt={`${car.marque} ${car.modele}`}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
-      <div className="absolute top-3 left-3 bg-[#e63946] text-white px-3 py-1 rounded-lg text-sm font-bold">
+      <div className="absolute top-3 left-3 bg-[#bef264] text-black px-3 py-1 rounded-lg text-sm font-bold">
         {formatPrice(car.prix)}
       </div>
-      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-lg text-xs font-medium">
+      <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-slate-200 px-3 py-1 rounded-lg text-xs font-medium">
         {car.annee}
       </div>
     </div>
     <div className="p-5">
-      <h3 className="text-lg font-bold text-[#1a1a2e] mb-2">
+      <h3 className="text-lg font-bold text-white mb-2">
         {car.marque} {car.modele}
       </h3>
-      <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+      <div className="flex flex-wrap gap-3 text-sm text-slate-400">
         <span className="flex items-center gap-1"><Gauge size={14} /> {formatKm(car.km)}</span>
         <span className="flex items-center gap-1"><Fuel size={14} /> {car.carburant}</span>
         <span className="flex items-center gap-1"><Cog size={14} /> {car.transmission}</span>
       </div>
       <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs text-gray-400">{car.puissance}</span>
-        <span className="text-[#1e3a5f] font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+        <span className="text-xs text-slate-500">{car.puissance}</span>
+        <span className="text-[#bef264] font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
           Voir details <ChevronRight size={14} />
         </span>
       </div>
@@ -454,12 +455,12 @@ const CarCard = ({ car, onClick }) => (
 // LATEST CARS SECTION
 // =============================================================================
 const LatestCarsSection = ({ cars, setCurrentPage, setSelectedCar }) => (
-  <section className="py-16 lg:py-24 bg-[#f8f9fa]">
+  <section className="py-16 lg:py-24 bg-[#111]">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <RevealSection>
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Derniers arrivages</h2>
-          <p className="text-gray-500 max-w-md mx-auto">Decouvrez nos vehicules d'occasion selectionnes et revises avec soin.</p>
+          <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">Derniers arrivages</h2>
+          <p className="text-slate-400 max-w-md mx-auto">Decouvrez nos vehicules d'occasion selectionnes et revises avec soin.</p>
         </div>
       </RevealSection>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -476,7 +477,7 @@ const LatestCarsSection = ({ cars, setCurrentPage, setSelectedCar }) => (
         <div className="text-center mt-10">
           <button
             onClick={() => { setCurrentPage('stock'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-8 py-3 rounded-xl font-semibold transition-all"
+            className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-8 py-3 rounded-xl font-semibold transition-all"
           >
             Voir tout le stock
           </button>
@@ -498,23 +499,23 @@ const ServicesSection = () => {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-white">
+    <section className="py-16 lg:py-24 bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <RevealSection>
           <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Nos services</h2>
-            <p className="text-gray-500 max-w-md mx-auto">Un accompagnement complet, de l'achat a la mise en route.</p>
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">Nos services</h2>
+            <p className="text-slate-400 max-w-md mx-auto">Un accompagnement complet, de l'achat a la mise en route.</p>
           </div>
         </RevealSection>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((s, i) => (
             <RevealSection key={i} delay={i * 100}>
-              <div className="bg-[#f8f9fa] rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                <div className="inline-flex p-4 bg-[#1e3a5f]/10 rounded-2xl text-[#1e3a5f] mb-4">
+              <div className="bg-[#111] rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-white/10">
+                <div className="inline-flex p-4 bg-[#bef264]/10 rounded-2xl text-[#bef264] mb-4">
                   {s.icon}
                 </div>
-                <h3 className="text-lg font-bold text-[#1a1a2e] mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
+                <h3 className="text-lg font-bold text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-slate-400 leading-relaxed">{s.desc}</p>
               </div>
             </RevealSection>
           ))}
@@ -528,31 +529,31 @@ const ServicesSection = () => {
 // REVIEWS PREVIEW
 // =============================================================================
 const ReviewsPreview = ({ reviews, setCurrentPage }) => (
-  <section className="py-16 lg:py-24 bg-[#f8f9fa]">
+  <section className="py-16 lg:py-24 bg-[#111]">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <RevealSection>
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Ce que disent nos clients</h2>
+          <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">Ce que disent nos clients</h2>
           <div className="flex items-center justify-center gap-2 mb-2">
             <StarRating rating={5} size={20} />
-            <span className="text-lg font-bold text-[#1a1a2e]">{BRAND.rating}/5</span>
+            <span className="text-lg font-bold text-white">{BRAND.rating}/5</span>
           </div>
-          <p className="text-gray-500">Avis verifies de nos clients satisfaits</p>
+          <p className="text-slate-400">Avis verifies de nos clients satisfaits</p>
         </div>
       </RevealSection>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {reviews.slice(0, 3).map((r, i) => (
           <RevealSection key={r.id} delay={i * 100}>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all">
+            <div className="bg-[#1a1a1a] rounded-2xl p-6 shadow-none border border-white/10 hover:shadow-md transition-all">
               <StarRating rating={r.rating} />
-              <p className="text-gray-600 mt-4 mb-4 text-sm leading-relaxed">"{r.text}"</p>
+              <p className="text-slate-300 mt-4 mb-4 text-sm leading-relaxed">"{r.text}"</p>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#1e3a5f] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-10 h-10 bg-[#bef264] rounded-full flex items-center justify-center text-black font-bold text-sm">
                   {r.name.charAt(0)}
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1a1a2e] text-sm">{r.name}</p>
-                  <p className="text-xs text-gray-400">{new Date(r.date).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
+                  <p className="font-semibold text-white text-sm">{r.name}</p>
+                  <p className="text-xs text-slate-500">{new Date(r.date).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
                 </div>
               </div>
             </div>
@@ -562,7 +563,7 @@ const ReviewsPreview = ({ reviews, setCurrentPage }) => (
       <div className="text-center mt-10">
         <button
           onClick={() => { setCurrentPage('reviews'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          className="border-2 border-[#1e3a5f] text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200"
+          className="border-2 border-white/20 text-[#bef264] hover:bg-[#bef264] hover:text-black px-8 py-3 rounded-xl font-semibold transition-all duration-200"
         >
           Voir tous les avis
         </button>
@@ -575,25 +576,25 @@ const ReviewsPreview = ({ reviews, setCurrentPage }) => (
 // CTA SECTION
 // =============================================================================
 const CTASection = () => (
-  <section className="py-16 lg:py-24 bg-white">
+  <section className="py-16 lg:py-24 bg-[#0a0a0a]">
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <RevealSection>
-        <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">
+        <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">
           Interesse par un vehicule ?
         </h2>
-        <p className="text-gray-500 mb-8 max-w-lg mx-auto text-lg">
+        <p className="text-slate-400 mb-8 max-w-lg mx-auto text-lg">
           Contactez-nous pour plus d'informations ou pour planifier un essai. Nous sommes a votre disposition.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <a
             href={BRAND.phoneLink}
-            className="bg-[#e63946] hover:bg-[#d62839] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all hover:shadow-xl hover:shadow-red-200 flex items-center gap-2"
+            className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-8 py-4 rounded-2xl font-bold text-lg transition-all hover:shadow-xl hover:shadow-[#bef264]/20 flex items-center gap-2"
           >
             <Phone size={20} /> {BRAND.phone}
           </a>
           <a
             href={`mailto:${BRAND.email}`}
-            className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-2"
+            className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-8 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-2"
           >
             <Mail size={20} /> Envoyer un email
           </a>
@@ -607,18 +608,18 @@ const CTASection = () => (
 // MAP SECTION
 // =============================================================================
 const MapSection = () => (
-  <section className="py-16 lg:py-24 bg-[#f8f9fa]">
+  <section className="py-16 lg:py-24 bg-[#111]">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <RevealSection>
         <div className="text-center mb-12">
-          <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Ou nous trouver</h2>
-          <p className="text-gray-500 flex items-center justify-center gap-2">
+          <h2 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">Ou nous trouver</h2>
+          <p className="text-slate-400 flex items-center justify-center gap-2">
             <MapPin size={16} /> {BRAND.address}
           </p>
         </div>
       </RevealSection>
       <RevealSection>
-        <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+        <div className="rounded-2xl overflow-hidden shadow-lg border border-white/10">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10142.0!2d2.86!3d50.533!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47dd3091e1fbe64d%3A0x40af13e8163c4e0!2s62138%20Billy-Berclau!5e0!3m2!1sfr!2sfr!4v1"
             width="100%"
@@ -651,26 +652,26 @@ const Footer = ({ setCurrentPage }) => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-[#e63946] flex items-center justify-center">
-                <Car size={22} className="text-white" />
+              <div className="w-10 h-10 rounded-xl bg-[#bef264] flex items-center justify-center">
+                <Car size={22} className="text-black" />
               </div>
               <div className="leading-tight">
                 <span className="text-xl font-extrabold">BRL</span>
-                <span className="block text-[10px] font-medium text-gray-400 tracking-widest uppercase">Negoce Auto</span>
+                <span className="block text-[10px] font-medium text-slate-500 tracking-widest uppercase">Negoce Auto</span>
               </div>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <p className="text-sm text-slate-400 leading-relaxed">
               Votre specialiste en vehicules d'occasion a Billy-Berclau. Qualite, transparence et prix justes.
             </p>
           </div>
 
           {/* Navigation */}
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-300">Navigation</h4>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-slate-400">Navigation</h4>
             <ul className="space-y-2">
               {[['Accueil', 'home'], ['Stock', 'stock'], ['A Propos', 'about'], ['Avis', 'reviews']].map(([label, page]) => (
                 <li key={page}>
-                  <button onClick={() => navigate(page)} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <button onClick={() => navigate(page)} className="text-sm text-slate-400 hover:text-white transition-colors">
                     {label}
                   </button>
                 </li>
@@ -680,8 +681,8 @@ const Footer = ({ setCurrentPage }) => {
 
           {/* Contact */}
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-300">Contact</h4>
-            <ul className="space-y-3 text-sm text-gray-400">
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-slate-400">Contact</h4>
+            <ul className="space-y-3 text-sm text-slate-400">
               <li className="flex items-center gap-2"><Phone size={14} /> {BRAND.phone}</li>
               <li className="flex items-center gap-2"><Mail size={14} /> {BRAND.email}</li>
               <li className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0" /> {BRAND.address}</li>
@@ -690,7 +691,7 @@ const Footer = ({ setCurrentPage }) => {
 
           {/* Social */}
           <div>
-            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-300">Suivez-nous</h4>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-slate-400">Suivez-nous</h4>
             <a
               href={BRAND.facebookUrl}
               target="_blank"
@@ -704,11 +705,11 @@ const Footer = ({ setCurrentPage }) => {
                 <StarRating rating={5} size={14} />
                 <span className="text-sm font-bold">{BRAND.rating}/5</span>
               </div>
-              <p className="text-xs text-gray-500">Note moyenne clients</p>
+              <p className="text-xs text-slate-500">Note moyenne clients</p>
             </div>
           </div>
         </div>
-        <div className="border-t border-white/10 mt-10 pt-8 text-center text-xs text-gray-500">
+        <div className="border-t border-white/10 mt-10 pt-8 text-center text-xs text-slate-500">
           &copy; {new Date().getFullYear()} BRL Negoce Auto - Tous droits reserves - Billy-Berclau 62138
         </div>
       </div>
@@ -741,27 +742,27 @@ const StockPage = ({ cars, setCurrentPage, setSelectedCar }) => {
   );
 
   return (
-    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#111] min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <RevealSection>
           <div className="text-center mb-10">
-            <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Notre stock</h1>
-            <p className="text-gray-500 mb-6">Tous nos vehicules disponibles a la vente</p>
+            <h1 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">Notre stock</h1>
+            <p className="text-slate-400 mb-6">Tous nos vehicules disponibles a la vente</p>
             <div className="max-w-md mx-auto relative">
-              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Rechercher un vehicule..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all"
               />
             </div>
           </div>
         </RevealSection>
 
         {filtered.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
+          <div className="text-center py-20 text-slate-500">
             <Car size={48} className="mx-auto mb-4 opacity-30" />
             <p className="text-lg">Aucun vehicule trouve.</p>
           </div>
@@ -817,12 +818,12 @@ const CarDetailPage = ({ car, setCurrentPage }) => {
   }
 
   return (
-    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#111] min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back button */}
         <button
           onClick={() => { setCurrentPage('stock'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          className="flex items-center gap-2 text-[#1e3a5f] hover:text-[#162d4a] font-medium mb-6 transition-colors"
+          className="flex items-center gap-2 text-[#bef264] hover:text-[#a8d84e] font-medium mb-6 transition-colors"
         >
           <ArrowLeft size={18} /> Retour au stock
         </button>
@@ -831,7 +832,7 @@ const CarDetailPage = ({ car, setCurrentPage }) => {
           {/* Gallery */}
           <RevealSection>
             <div>
-              <div className="rounded-2xl overflow-hidden shadow-lg mb-4 aspect-[4/3] bg-gray-200">
+              <div className="rounded-2xl overflow-hidden shadow-lg mb-4 aspect-[4/3] bg-[#1a1a1a]">
                 <img
                   src={car.images?.[activeImg] || "https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop"}
                   alt={`${car.marque} ${car.modele}`}
@@ -844,7 +845,7 @@ const CarDetailPage = ({ car, setCurrentPage }) => {
                     <button
                       key={i}
                       onClick={() => setActiveImg(i)}
-                      className={`w-20 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImg ? 'border-[#e63946] shadow-md' : 'border-gray-200 opacity-60 hover:opacity-100'}`}
+                      className={`w-20 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImg ? 'border-[#bef264] shadow-md' : 'border-white/10 opacity-60 hover:opacity-100'}`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />
                     </button>
@@ -857,31 +858,31 @@ const CarDetailPage = ({ car, setCurrentPage }) => {
           {/* Info */}
           <RevealSection delay={200}>
             <div>
-              <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-2">
+              <h1 className="text-3xl lg:text-4xl font-extrabold text-white mb-2">
                 {car.marque} {car.modele}
               </h1>
-              <p className="text-gray-500 mb-4 flex items-center gap-4">
+              <p className="text-slate-400 mb-4 flex items-center gap-4">
                 <span className="flex items-center gap-1"><Calendar size={14} /> {car.annee}</span>
                 <span className="flex items-center gap-1"><Gauge size={14} /> {formatKm(car.km)}</span>
                 <span className="flex items-center gap-1"><Fuel size={14} /> {car.carburant}</span>
               </p>
-              <div className="text-4xl font-extrabold text-[#e63946] mb-6">{formatPrice(car.prix)}</div>
+              <div className="text-4xl font-extrabold text-[#bef264] mb-6">{formatPrice(car.prix)}</div>
 
-              <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
-                <h3 className="font-bold text-[#1a1a2e] mb-2">Description</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{car.description}</p>
+              <div className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/10 shadow-none mb-6">
+                <h3 className="font-bold text-white mb-2">Description</h3>
+                <p className="text-sm text-slate-300 leading-relaxed">{car.description}</p>
               </div>
 
               <div className="flex flex-wrap gap-3">
                 <a
                   href={BRAND.phoneLink}
-                  className="flex-1 min-w-[200px] bg-[#e63946] hover:bg-[#d62839] text-white px-6 py-4 rounded-2xl font-bold text-center transition-all hover:shadow-xl hover:shadow-red-200 flex items-center justify-center gap-2"
+                  className="flex-1 min-w-[200px] bg-[#bef264] hover:bg-[#a8d84e] text-black px-6 py-4 rounded-2xl font-bold text-center transition-all hover:shadow-xl hover:shadow-[#bef264]/20 flex items-center justify-center gap-2"
                 >
                   <Phone size={18} /> Nous contacter
                 </a>
                 <a
                   href={`mailto:${BRAND.email}?subject=Interet pour ${car.marque} ${car.modele} ${car.annee}`}
-                  className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-6 py-4 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2"
+                  className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-6 py-4 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2"
                 >
                   <Mail size={18} /> Email
                 </a>
@@ -892,32 +893,32 @@ const CarDetailPage = ({ car, setCurrentPage }) => {
 
         {/* FICHE D'IDENTITE */}
         <RevealSection>
-          <div className="bg-white rounded-2xl border-2 border-[#1e3a5f]/20 shadow-lg overflow-hidden">
-            <div className="bg-[#1e3a5f] px-6 py-4 flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <FileText size={20} className="text-white" />
+          <div className="bg-[#1a1a1a] rounded-2xl border-2 border-white/10 shadow-lg overflow-hidden">
+            <div className="bg-[#bef264] px-6 py-4 flex items-center gap-3">
+              <div className="p-2 bg-black/20 rounded-lg">
+                <FileText size={20} className="text-black" />
               </div>
               <div>
-                <h2 className="text-lg font-extrabold text-white tracking-wide">FICHE D'IDENTITE DU VEHICULE</h2>
-                <p className="text-xs text-white/60">Carte technique - {car.marque} {car.modele} {car.annee}</p>
+                <h2 className="text-lg font-extrabold text-black tracking-wide">FICHE D'IDENTITE DU VEHICULE</h2>
+                <p className="text-xs text-black/60">Carte technique - {car.marque} {car.modele} {car.annee}</p>
               </div>
             </div>
             <div className="p-6">
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {identityItems.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 bg-[#f8f9fa] rounded-xl border border-gray-100">
-                    <div className="p-2 bg-[#1e3a5f]/10 rounded-lg text-[#1e3a5f] shrink-0">
+                  <div key={i} className="flex items-center gap-3 p-3 bg-[#111] rounded-xl border border-white/10">
+                    <div className="p-2 bg-[#bef264]/10 rounded-lg text-[#bef264] shrink-0">
                       {item.icon}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs text-gray-400 uppercase tracking-wide">{item.label}</p>
-                      <p className="text-sm font-semibold text-[#1a1a2e] truncate">{item.value}</p>
+                      <p className="text-xs text-slate-500 uppercase tracking-wide">{item.label}</p>
+                      <p className="text-sm font-semibold text-white truncate">{item.value}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="bg-[#f8f9fa] px-6 py-3 text-xs text-gray-400 text-center border-t border-gray-100">
+            <div className="bg-[#111] px-6 py-3 text-xs text-slate-500 text-center border-t border-white/10">
               Donnees constructeur indicatives - BRL Negoce Auto - {BRAND.phone}
             </div>
           </div>
@@ -931,12 +932,12 @@ const CarDetailPage = ({ car, setCurrentPage }) => {
 // ABOUT PAGE
 // =============================================================================
 const AboutPage = () => (
-  <section className="pt-24 lg:pt-32 pb-16 bg-white min-h-screen">
+  <section className="pt-24 lg:pt-32 pb-16 bg-[#0a0a0a] min-h-screen">
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       <RevealSection>
         <div className="text-center mb-12">
-          <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">A propos de BRL Negoce Auto</h1>
-          <p className="text-gray-500 max-w-xl mx-auto">
+          <h1 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">A propos de BRL Negoce Auto</h1>
+          <p className="text-slate-400 max-w-xl mx-auto">
             Votre garage de confiance pour l'achat de vehicules d'occasion a Billy-Berclau et ses environs.
           </p>
         </div>
@@ -944,7 +945,7 @@ const AboutPage = () => (
 
       <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
         <RevealSection>
-          <div className="rounded-2xl overflow-hidden shadow-lg aspect-[4/3] bg-gray-100">
+          <div className="rounded-2xl overflow-hidden shadow-lg aspect-[4/3] bg-[#1a1a1a]">
             <img
               src="https://images.unsplash.com/photo-1486006920555-c77dcf18193c?w=800&h=600&fit=crop"
               alt="Garage BRL Negoce Auto"
@@ -954,14 +955,14 @@ const AboutPage = () => (
         </RevealSection>
         <RevealSection delay={200}>
           <div>
-            <h2 className="text-2xl font-extrabold text-[#1a1a2e] mb-4">Notre histoire</h2>
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <h2 className="text-2xl font-extrabold text-white mb-4">Notre histoire</h2>
+            <p className="text-slate-300 leading-relaxed mb-4">
               BRL Negoce Auto est un garage specialise dans la vente de vehicules d'occasion selectionnes avec soin. Implante a Billy-Berclau, nous mettons un point d'honneur a proposer des vehicules de qualite a des prix justes.
             </p>
-            <p className="text-gray-600 leading-relaxed mb-4">
+            <p className="text-slate-300 leading-relaxed mb-4">
               Avec plus de 750 ventes realisees et une note de 4.8/5 sur les avis clients, notre reputation est notre meilleure carte de visite. Chaque vehicule est minutieusement inspecte et revise avant mise en vente.
             </p>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-slate-300 leading-relaxed">
               Nous accompagnons chaque client dans son projet, de la selection du vehicule a la remise des cles, en passant par les demarches administratives.
             </p>
           </div>
@@ -970,7 +971,7 @@ const AboutPage = () => (
 
       {/* Values */}
       <RevealSection>
-        <h2 className="text-2xl font-extrabold text-[#1a1a2e] text-center mb-8">Nos valeurs</h2>
+        <h2 className="text-2xl font-extrabold text-white text-center mb-8">Nos valeurs</h2>
       </RevealSection>
       <div className="grid sm:grid-cols-3 gap-6 mb-16">
         {[
@@ -979,10 +980,10 @@ const AboutPage = () => (
           { icon: <Award size={28} />, title: "Qualite", desc: "Vehicules soigneusement selectionnes et revises par nos soins." }
         ].map((v, i) => (
           <RevealSection key={i} delay={i * 100}>
-            <div className="text-center p-6 bg-[#f8f9fa] rounded-2xl border border-gray-100">
-              <div className="inline-flex p-4 bg-[#1e3a5f]/10 rounded-2xl text-[#1e3a5f] mb-4">{v.icon}</div>
-              <h3 className="text-lg font-bold text-[#1a1a2e] mb-2">{v.title}</h3>
-              <p className="text-sm text-gray-500">{v.desc}</p>
+            <div className="text-center p-6 bg-[#111] rounded-2xl border border-white/10">
+              <div className="inline-flex p-4 bg-[#bef264]/10 rounded-2xl text-[#bef264] mb-4">{v.icon}</div>
+              <h3 className="text-lg font-bold text-white mb-2">{v.title}</h3>
+              <p className="text-sm text-slate-400">{v.desc}</p>
             </div>
           </RevealSection>
         ))}
@@ -990,19 +991,19 @@ const AboutPage = () => (
 
       {/* Contact info */}
       <RevealSection>
-        <div className="bg-[#1e3a5f] rounded-2xl p-8 text-white text-center">
+        <div className="bg-[#bef264] rounded-2xl p-8 text-black text-center">
           <h2 className="text-2xl font-extrabold mb-6">Nos coordonnees</h2>
           <div className="grid sm:grid-cols-3 gap-6">
             <div className="flex flex-col items-center gap-2">
-              <div className="p-3 bg-white/10 rounded-xl"><Phone size={22} /></div>
+              <div className="p-3 bg-black/10 rounded-xl"><Phone size={22} /></div>
               <p className="font-semibold">{BRAND.phone}</p>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <div className="p-3 bg-white/10 rounded-xl"><Mail size={22} /></div>
+              <div className="p-3 bg-black/10 rounded-xl"><Mail size={22} /></div>
               <p className="font-semibold text-sm">{BRAND.email}</p>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <div className="p-3 bg-white/10 rounded-xl"><MapPin size={22} /></div>
+              <div className="p-3 bg-black/10 rounded-xl"><MapPin size={22} /></div>
               <p className="font-semibold text-sm">{BRAND.address}</p>
             </div>
           </div>
@@ -1040,45 +1041,45 @@ const ReviewsPage = ({ reviews, setReviews }) => {
   };
 
   return (
-    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#111] min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <RevealSection>
           <div className="text-center mb-10">
-            <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Avis clients</h1>
+            <h1 className="text-3xl lg:text-4xl font-extrabold text-white mb-4">Avis clients</h1>
             <div className="flex items-center justify-center gap-2 mb-2">
               <StarRating rating={5} size={22} />
-              <span className="text-xl font-bold text-[#1a1a2e]">{BRAND.rating}/5</span>
+              <span className="text-xl font-bold text-white">{BRAND.rating}/5</span>
             </div>
-            <p className="text-gray-500">{reviews.length} avis</p>
+            <p className="text-slate-400">{reviews.length} avis</p>
           </div>
         </RevealSection>
 
         {/* Form */}
         <RevealSection>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-10">
-            <h2 className="text-xl font-bold text-[#1a1a2e] mb-4 flex items-center gap-2">
+          <div className="bg-[#1a1a1a] rounded-2xl p-6 shadow-none border border-white/10 mb-10">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <MessageSquare size={20} /> Laisser un avis
             </h2>
             {submitted && (
-              <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl mb-4 flex items-center gap-2 text-sm">
+              <div className="bg-green-900/30 text-green-400 px-4 py-3 rounded-xl mb-4 flex items-center gap-2 text-sm">
                 <CheckCircle2 size={16} /> Merci pour votre avis !
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Votre nom</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Votre nom</label>
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Jean D."
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all"
+                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">Note</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Note</label>
                   <div className="flex gap-1 mt-2">
                     {[1, 2, 3, 4, 5].map(i => (
                       <button
@@ -1097,19 +1098,19 @@ const ReviewsPage = ({ reviews, setReviews }) => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Votre avis</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Votre avis</label>
                 <textarea
                   value={text}
                   onChange={e => setText(e.target.value)}
                   placeholder="Partagez votre experience..."
                   required
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all resize-none"
                 />
               </div>
               <button
                 type="submit"
-                className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-8 py-3 rounded-xl font-semibold transition-all"
+                className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-8 py-3 rounded-xl font-semibold transition-all"
               >
                 Publier mon avis
               </button>
@@ -1121,22 +1122,22 @@ const ReviewsPage = ({ reviews, setReviews }) => {
         <div className="space-y-4">
           {reviews.map((r, i) => (
             <RevealSection key={r.id} delay={i * 80}>
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="bg-[#1a1a1a] rounded-2xl p-6 shadow-none border border-white/10">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#1e3a5f] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 bg-[#bef264] rounded-full flex items-center justify-center text-black font-bold text-sm">
                       {r.name.charAt(0)}
                     </div>
                     <div>
-                      <p className="font-semibold text-[#1a1a2e]">{r.name}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="font-semibold text-white">{r.name}</p>
+                      <p className="text-xs text-slate-500">
                         {new Date(r.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
                   </div>
                   <StarRating rating={r.rating} />
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed">"{r.text}"</p>
+                <p className="text-slate-300 text-sm leading-relaxed">"{r.text}"</p>
               </div>
             </RevealSection>
           ))}
@@ -1251,19 +1252,19 @@ const AdminPage = ({ cars, setCars }) => {
   // Login screen
   if (!loggedIn) {
     return (
-      <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen flex items-center justify-center">
+      <section className="pt-24 lg:pt-32 pb-16 bg-[#111] min-h-screen flex items-center justify-center">
         <div className="w-full max-w-md px-4">
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+          <div className="bg-[#1a1a1a] rounded-2xl p-8 shadow-lg border border-white/10">
             <div className="text-center mb-6">
-              <div className="inline-flex p-4 bg-[#1e3a5f]/10 rounded-2xl mb-4">
-                <Lock size={28} className="text-[#1e3a5f]" />
+              <div className="inline-flex p-4 bg-[#bef264]/10 rounded-2xl mb-4">
+                <Lock size={28} className="text-[#bef264]" />
               </div>
-              <h1 className="text-2xl font-extrabold text-[#1a1a2e]">Administration</h1>
-              <p className="text-sm text-gray-500 mt-1">Acces reserve au gerant</p>
+              <h1 className="text-2xl font-extrabold text-white">Administration</h1>
+              <p className="text-sm text-slate-400 mt-1">Acces reserve au gerant</p>
             </div>
             <form onSubmit={handleLogin} className="space-y-4">
               {error && (
-                <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                <div className="bg-red-900/30 text-red-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
                   <X size={16} /> {error}
                 </div>
               )}
@@ -1272,9 +1273,9 @@ const AdminPage = ({ cars, setCars }) => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="Mot de passe"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all"
               />
-              <button type="submit" className="w-full bg-[#1e3a5f] hover:bg-[#162d4a] text-white py-3 rounded-xl font-semibold transition-all">
+              <button type="submit" className="w-full bg-[#bef264] hover:bg-[#a8d84e] text-black py-3 rounded-xl font-semibold transition-all">
                 Se connecter
               </button>
             </form>
@@ -1286,24 +1287,24 @@ const AdminPage = ({ cars, setCars }) => {
 
   // Admin dashboard
   return (
-    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#111] min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-extrabold text-[#1a1a2e]">Tableau de bord</h1>
-            <p className="text-gray-500 text-sm">{cars.length} vehicule(s) en stock</p>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-white">Tableau de bord</h1>
+            <p className="text-slate-400 text-sm">{cars.length} vehicule(s) en stock</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowForm(!showForm)}
-              className="bg-[#e63946] hover:bg-[#d62839] text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2"
+              className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2"
             >
               {showForm ? <X size={18} /> : <Plus size={18} />}
               {showForm ? 'Annuler' : 'Ajouter un vehicule'}
             </button>
             <button
               onClick={() => setLoggedIn(false)}
-              className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all text-sm font-medium"
+              className="px-4 py-2.5 rounded-xl border border-white/10 text-slate-300 hover:bg-white/10 transition-all text-sm font-medium"
             >
               Deconnexion
             </button>
@@ -1312,12 +1313,12 @@ const AdminPage = ({ cars, setCars }) => {
 
         {/* Add form */}
         {showForm && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
-            <h2 className="text-xl font-bold text-[#1a1a2e] mb-6">Nouveau vehicule</h2>
+          <div className="bg-[#1a1a1a] rounded-2xl p-6 shadow-none border border-white/10 mb-8">
+            <h2 className="text-xl font-bold text-white mb-6">Nouveau vehicule</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Main info */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Informations generales</h3>
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Informations generales</h3>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
                     { key: 'marque', label: 'Marque *', placeholder: 'Renault', type: 'text' },
@@ -1330,23 +1331,23 @@ const AdminPage = ({ cars, setCars }) => {
                     { key: 'nbProprietaires', label: 'Nb proprietaires', placeholder: '1', type: 'number' }
                   ].map(field => (
                     <div key={field.key}>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">{field.label}</label>
+                      <label className="block text-sm font-medium text-slate-300 mb-1">{field.label}</label>
                       <input
                         type={field.type}
                         value={form[field.key]}
                         onChange={e => setForm(prev => ({ ...prev, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all text-sm"
                         required={field.label.includes('*')}
                       />
                     </div>
                   ))}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Carburant</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Carburant</label>
                     <select
                       value={form.carburant}
                       onChange={e => setForm(prev => ({ ...prev, carburant: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all text-sm"
                     >
                       <option>Essence</option>
                       <option>Diesel</option>
@@ -1356,11 +1357,11 @@ const AdminPage = ({ cars, setCars }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Transmission</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Transmission</label>
                     <select
                       value={form.transmission}
                       onChange={e => setForm(prev => ({ ...prev, transmission: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all text-sm"
                     >
                       <option>Manuelle</option>
                       <option>Automatique</option>
@@ -1371,14 +1372,14 @@ const AdminPage = ({ cars, setCars }) => {
 
               {/* Specs constructeur */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Donnees constructeur (optionnel)</h3>
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Donnees constructeur (optionnel)</h3>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Type carrosserie</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Type carrosserie</label>
                     <select
                       value={form.carrosserie}
                       onChange={e => setForm(prev => ({ ...prev, carrosserie: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all text-sm"
                     >
                       <option>Citadine</option>
                       <option>Berline</option>
@@ -1391,11 +1392,11 @@ const AdminPage = ({ cars, setCars }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Nb portes</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Nb portes</label>
                     <select
                       value={form.portes}
                       onChange={e => setForm(prev => ({ ...prev, portes: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all text-sm"
                     >
                       <option>3</option>
                       <option>5</option>
@@ -1409,22 +1410,22 @@ const AdminPage = ({ cars, setCars }) => {
                     { key: 'co2', label: 'Emissions CO2', placeholder: '129 g/km' },
                   ].map(field => (
                     <div key={field.key}>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">{field.label}</label>
+                      <label className="block text-sm font-medium text-slate-300 mb-1">{field.label}</label>
                       <input
                         type="text"
                         value={form[field.key]}
                         onChange={e => setForm(prev => ({ ...prev, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                        className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all text-sm"
                       />
                     </div>
                   ))}
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Norme Euro</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Norme Euro</label>
                     <select
                       value={form.normeEuro}
                       onChange={e => setForm(prev => ({ ...prev, normeEuro: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all text-sm"
                     >
                       <option>Euro 3</option>
                       <option>Euro 4</option>
@@ -1439,18 +1440,18 @@ const AdminPage = ({ cars, setCars }) => {
 
               {/* Images */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Photos</h3>
+                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Photos</h3>
                 <div
                   onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                   onDragLeave={() => setDragOver(false)}
                   onDrop={handleDrop}
                   className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
-                    dragOver ? 'border-[#1e3a5f] bg-[#1e3a5f]/5' : 'border-gray-200 hover:border-gray-300'
+                    dragOver ? 'border-[#bef264] bg-[#bef264]/5' : 'border-white/10 hover:border-white/20'
                   }`}
                 >
-                  <Upload size={32} className="mx-auto text-gray-300 mb-3" />
-                  <p className="text-sm text-gray-500 mb-2">Glissez-deposez vos photos ici</p>
-                  <label className="inline-block bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
+                  <Upload size={32} className="mx-auto text-slate-500 mb-3" />
+                  <p className="text-sm text-slate-400 mb-2">Glissez-deposez vos photos ici</p>
+                  <label className="inline-block bg-white/10 hover:bg-white/20 text-slate-200 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
                     Parcourir
                     <input
                       type="file"
@@ -1465,7 +1466,7 @@ const AdminPage = ({ cars, setCars }) => {
                   <div className="flex flex-wrap gap-3 mt-4">
                     {images.map((img, i) => (
                       <div key={i} className="relative group">
-                        <img src={img} alt="" className="w-20 h-16 object-cover rounded-xl border border-gray-200" />
+                        <img src={img} alt="" className="w-20 h-16 object-cover rounded-xl border border-white/10" />
                         <button
                           type="button"
                           onClick={() => setImages(prev => prev.filter((_, idx) => idx !== i))}
@@ -1481,19 +1482,19 @@ const AdminPage = ({ cars, setCars }) => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">Description</label>
                 <textarea
                   value={form.description}
                   onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Decrivez le vehicule..."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all resize-none text-sm"
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-[#1a1a1a] text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#bef264]/30 focus:border-[#bef264] transition-all resize-none text-sm"
                 />
               </div>
 
               <button
                 type="submit"
-                className="bg-[#e63946] hover:bg-[#d62839] text-white px-8 py-3 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-red-200"
+                className="bg-[#bef264] hover:bg-[#a8d84e] text-black px-8 py-3 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-[#bef264]/20"
               >
                 Ajouter le vehicule
               </button>
@@ -1504,21 +1505,21 @@ const AdminPage = ({ cars, setCars }) => {
         {/* Cars list */}
         <div className="space-y-4">
           {cars.map(car => (
-            <div key={car.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+            <div key={car.id} className="bg-[#1a1a1a] rounded-2xl p-4 shadow-none border border-white/10 flex items-center gap-4">
               <img
                 src={car.images?.[0] || "https://images.unsplash.com/photo-1549924231-f129b911e442?w=200&h=150&fit=crop"}
                 alt={`${car.marque} ${car.modele}`}
                 className="w-24 h-18 object-cover rounded-xl shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-[#1a1a2e]">{car.marque} {car.modele}</h3>
-                <p className="text-sm text-gray-500">{car.annee} - {formatKm(car.km)} - {car.carburant}</p>
+                <h3 className="font-bold text-white">{car.marque} {car.modele}</h3>
+                <p className="text-sm text-slate-400">{car.annee} - {formatKm(car.km)} - {car.carburant}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-lg font-extrabold text-[#e63946]">{formatPrice(car.prix)}</p>
+                <p className="text-lg font-extrabold text-[#bef264]">{formatPrice(car.prix)}</p>
                 <button
                   onClick={() => deleteCar(car.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors mt-1"
+                  className="text-slate-500 hover:text-red-500 transition-colors mt-1"
                   title="Supprimer"
                 >
                   <Trash2 size={18} />
@@ -1562,7 +1563,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#0a0a0a]">
       <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} setShowAdmin={setShowAdmin} />
       <main>{renderPage()}</main>
       <Footer setCurrentPage={setCurrentPage} />
