@@ -1,801 +1,1571 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Plus, 
-  Trash2, 
-  Camera, 
-  Zap, 
-  ArrowRight, 
-  ChevronRight, 
-  Star, 
-  Fuel, 
-  Gauge, 
-  Calendar, 
-  Handshake, 
-  Facebook, 
-  MapPin, 
-  Phone, 
-  Clock, 
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  Plus,
+  Trash2,
+  Camera,
+  ArrowRight,
+  ChevronRight,
+  Star,
+  Fuel,
+  Gauge,
+  Calendar,
+  Facebook,
+  MapPin,
+  Phone,
+  Clock,
   CheckCircle2,
   X,
-  LayoutDashboard,
-  Smartphone,
   ShieldCheck,
   Award,
   Car,
   Search,
   Mail,
-  Instagram,
   ChevronLeft,
-  MessageSquare,
-  HelpCircle,
-  Settings,
   Lock,
-  ArrowUpRight,
-  Info,
-  User,
-  Quote,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Menu,
+  FileText,
+  CreditCard,
+  Handshake,
+  Users,
+  Heart,
+  Eye,
+  ArrowLeft,
+  Settings,
+  Palette,
+  Weight,
+  Ruler,
+  Leaf,
+  DoorOpen,
+  User,
+  Cog,
+  Info,
+  MessageSquare
 } from 'lucide-react';
 
 // --- CONFIGURATION ---
 const BRAND = {
-  name: "BRL NÉGOCE AUTO",
+  name: "BRL NEGOCE AUTO",
   phone: "06 31 53 10 34",
+  phoneLink: "tel:+33631531034",
   email: "brl.negoce@gmail.com",
   facebookUrl: "https://www.facebook.com/p/BRL-Negoce-Auto-100067446651682/",
-  address: "6 rue Jules ferry, Billy-Berclau, 62138",
+  address: "6 rue Jules Ferry, Billy-Berclau 62138",
   rating: 4.8,
-  colors: {
-    primary: "#bef264", // Lime Green
-    dark: "#0a0a0a",
-    darker: "#050505",
-    textGray: "#94a3b8"
+  totalSales: 750,
+  mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2535.5!2d2.861!3d50.533!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47dd2!2sBilly-Berclau!5e0!3m2!1sfr!2sfr!4v1"
+};
+
+const COLORS = {
+  primary: "#1e3a5f",
+  accent: "#e63946",
+  white: "#ffffff",
+  lightGray: "#f8f9fa",
+  darkText: "#1a1a2e",
+  grayText: "#6b7280",
+  border: "#e5e7eb"
+};
+
+// --- MANUFACTURER SPECS ---
+const MANUFACTURER_SPECS = {
+  "citroen_c3_2011": {
+    carrosserie: "Citadine",
+    portes: 5,
+    dimensions: "3941 x 1728 x 1524 mm",
+    poids: "1050 kg",
+    coffre: "300 L",
+    consoMixte: "5.5 L/100km",
+    co2: "129 g/km",
+    normeEuro: "Euro 5"
+  },
+  "renault_twingo_2014": {
+    carrosserie: "Citadine",
+    portes: 5,
+    dimensions: "3686 x 1654 x 1470 mm",
+    poids: "1025 kg",
+    coffre: "230 L",
+    consoMixte: "5.4 L/100km",
+    co2: "119 g/km",
+    normeEuro: "Euro 5"
   }
 };
 
-// --- COMPOSANT LOGO ---
-const BRLLogo = ({ size = "md", className = "" }) => {
-  const sizes = {
-    sm: "w-12 h-12",
-    md: "w-16 h-16",
-    lg: "w-32 h-32",
-    xl: "w-48 h-48"
-  };
-  
+// --- INITIAL DATA ---
+const INITIAL_CARS = [
+  {
+    id: 1,
+    marque: "Citroen",
+    modele: "C3",
+    annee: 2011,
+    prix: 6290,
+    km: 98000,
+    carburant: "Essence",
+    transmission: "Manuelle",
+    puissance: "60 ch",
+    couleur: "Gris",
+    nbProprietaires: 2,
+    description: "Citroen C3 en tres bon etat general. Entretien suivi avec carnet. Climatisation, direction assistee, vitres electriques. Ideale pour la ville comme pour les trajets quotidiens. Controle technique OK. Vehicule non fumeur.",
+    images: [
+      "https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&h=600&fit=crop"
+    ],
+    specsKey: "citroen_c3_2011"
+  },
+  {
+    id: 2,
+    marque: "Renault",
+    modele: "Twingo",
+    annee: 2014,
+    prix: 3490,
+    km: 115000,
+    carburant: "Essence",
+    transmission: "Manuelle",
+    puissance: "75 ch",
+    couleur: "Blanc",
+    nbProprietaires: 1,
+    description: "Renault Twingo 2 phase 2 en excellent etat. Premiere main, entretien rigoureux en concession. Climatisation, Bluetooth, regulateur de vitesse. Tres economique a l'usage. Parfaite premiere voiture ou second vehicule. CT vierge.",
+    images: [
+      "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&h=600&fit=crop"
+    ],
+    specsKey: "renault_twingo_2014"
+  }
+];
+
+const INITIAL_REVIEWS = [
+  {
+    id: 1,
+    name: "Mickael B.",
+    rating: 5,
+    text: "Excellent service ! Vehicule conforme a la description, equipe tres professionnelle et a l'ecoute. Je recommande vivement BRL Negoce Auto.",
+    date: "2025-11-15"
+  },
+  {
+    id: 2,
+    name: "Sandrine L.",
+    rating: 5,
+    text: "Tres satisfaite de mon achat. La voiture etait en parfait etat, le prix etait juste. Merci pour la transparence et la gentillesse !",
+    date: "2025-12-02"
+  },
+  {
+    id: 3,
+    name: "Kevin D.",
+    rating: 4,
+    text: "Bon rapport qualite-prix, equipe sympa et reactive. La carte grise a ete faite rapidement. Je reviendrai pour mon prochain achat.",
+    date: "2026-01-20"
+  }
+];
+
+// --- HELPER ---
+const formatPrice = (p) => new Intl.NumberFormat('fr-FR').format(p) + " \u20AC";
+const formatKm = (k) => new Intl.NumberFormat('fr-FR').format(k) + " km";
+
+const StarRating = ({ rating, size = 16 }) => (
+  <div className="flex gap-0.5">
+    {[1, 2, 3, 4, 5].map(i => (
+      <Star
+        key={i}
+        size={size}
+        className={i <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
+      />
+    ))}
+  </div>
+);
+
+// --- SCROLL ANIMATION HOOK ---
+const useScrollReveal = () => {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); obs.disconnect(); }
+    }, { threshold: 0.1 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, visible];
+};
+
+const RevealSection = ({ children, className = "", delay = 0 }) => {
+  const [ref, visible] = useScrollReveal();
   return (
-    <div className={`relative rounded-full border-[3px] border-[#bef264] flex items-center justify-center bg-black overflow-hidden shadow-[0_0_20px_rgba(190,242,100,0.4)] ${sizes[size]} ${className}`}>
-      <div className="absolute inset-0 opacity-40" style={{backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '4px 4px'}}></div>
-      <div className="relative flex flex-col items-center leading-none text-center">
-        <span className="text-white font-black italic tracking-tighter text-metal" style={{ fontSize: size === 'lg' ? '2.5rem' : size === 'md' ? '1.2rem' : '0.8rem' }}>BRL</span>
-        <div className="h-[1.5px] w-full bg-[#bef264] my-1 opacity-50"></div>
-        <span className="text-white font-bold uppercase tracking-[0.1em]" style={{ fontSize: size === 'lg' ? '0.6rem' : '0.4rem' }}>
-          NÉGOCE <span className="text-[#bef264]">AUTO</span>
-        </span>
-      </div>
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
     </div>
   );
 };
 
-const INITIAL_REVIEWS = [
-  { id: 1, author: "Mickael B.", rating: 5, text: "Garage très sérieux, je recommande les yeux fermés. Achat d'un véhicule, tout s'est très bien passé.", date: "Il y a 2 mois" },
-  { id: 2, author: "Sandrine L.", rating: 5, text: "Très bon accueil et conseils. Ravie de mon achat, véhicule propre et révisé.", date: "Il y a 5 mois" },
-  { id: 3, author: "Kevin D.", rating: 5, text: "Sérieux et professionnel. Le service carte grise est un vrai plus !", date: "Il y a 1 mois" }
-];
-
-const INITIAL_CARS = [
-  {
-    id: 1,
-    brand: "CITROËN",
-    model: "C3 1.1 60CH 5P",
-    year: "2011",
-    price: "6290",
-    km: "81275",
-    fuel: "Essence",
-    images: [
-      "https://images.unsplash.com/photo-1621236304191-f9259837a57a?auto=format&fit=crop&q=80&w=1200",
-      "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80&w=1200"
-    ],
-    description: "SAS BRL NEGOCE AUTO propose cette magnifique Citroën C3 1.1 (60 ch). \n\nDistribution neuve, mécanique fiable et économique. Contrôle Technique OK (2 ans), Vidange neuve, Disques/plaquettes avant neufs, Triangles neufs.\n\nOptions principales :\n- Radio CD\n- Ordinateur de bord\n- Sièges et Volant réglables\n- Banquette 2/3 1/3\n- Airbags, ABS, ESP, Isofix\n- Carnet d'entretien à jour.",
-    specs: { transmission: "Manuelle", power: "60 ch", color: "Bleu", owners: "2" }
-  },
-  {
-    id: 2,
-    brand: "RENAULT",
-    model: "TWINGO 1.2 16V 75CH",
-    year: "2014",
-    price: "3490",
-    km: "197000",
-    fuel: "Essence",
-    images: [
-      "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1200",
-      "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=1200"
-    ],
-    description: "Note importante : Compteur affichant 113.000km mais réel estimé à 197.000km (compteur remplacé par l'ancien propriétaire). Le prix tient compte de cette information.\n\nMécanique fiable, très économique en consommation.\n\nTravaux récents :\n- Toit ouvrant panoramique\n- Distribution OK (2022)\n- Embrayage OK (2022)\n- Vidange neuve\n- Entretien à jour.",
-    specs: { transmission: "Manuelle", power: "75 ch", color: "Gris", owners: "2" }
-  }
-];
-
-export default function App() {
-  const [view, setView] = useState('home'); 
+// =============================================================================
+// NAVBAR
+// =============================================================================
+const Navbar = ({ currentPage, setCurrentPage, setShowAdmin }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [cars, setCars] = useState(INITIAL_CARS);
-  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  
-  // Admin Auth
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [adminPass, setAdminPass] = useState("");
-  const ADMIN_SECRET = "Brlnegoce62138!"; 
-
-  const [newCar, setNewCar] = useState({
-    brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", 
-    images: [], description: "", transmission: "Automatique", power: "", color: ""
-  });
-
-  const [newReview, setNewReview] = useState({ author: "", text: "", rating: 5 });
-  const fileInputRef = useRef(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handler = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    processFiles(files);
+  const navLinks = [
+    { id: 'home', label: 'Accueil' },
+    { id: 'stock', label: 'Stock' },
+    { id: 'about', label: 'A Propos' },
+    { id: 'reviews', label: 'Avis' }
+  ];
+
+  const navigate = (page) => {
+    setCurrentPage(page);
+    setMobileOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const processFiles = (files) => {
-    files.forEach(file => {
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-white'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          {/* Logo */}
+          <button onClick={() => navigate('home')} className="flex items-center gap-2 group">
+            <div className="w-10 h-10 rounded-xl bg-[#1e3a5f] flex items-center justify-center">
+              <Car size={22} className="text-white" />
+            </div>
+            <div className="leading-tight">
+              <span className="text-xl font-extrabold text-[#1e3a5f] tracking-tight">BRL</span>
+              <span className="block text-[10px] font-semibold text-gray-500 tracking-widest uppercase">Negoce Auto</span>
+            </div>
+          </button>
+
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map(link => (
+              <button
+                key={link.id}
+                onClick={() => navigate(link.id)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  currentPage === link.id
+                    ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]'
+                    : 'text-gray-600 hover:text-[#1e3a5f] hover:bg-gray-100'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Right side */}
+          <div className="hidden md:flex items-center gap-3">
+            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e3a5f] transition-colors">
+              <Phone size={16} />
+              <span className="font-medium">{BRAND.phone}</span>
+            </a>
+            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="bg-[#e63946] hover:bg-[#d62839] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-red-200">
+              Nous appeler
+            </a>
+            <button
+              onClick={() => { setShowAdmin(true); setCurrentPage('admin'); setMobileOpen(false); }}
+              className="p-2 rounded-lg text-gray-400 hover:text-[#1e3a5f] hover:bg-gray-100 transition-colors"
+              title="Admin"
+            >
+              <Lock size={16} />
+            </button>
+          </div>
+
+          {/* Mobile hamburger */}
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-100">
+            {mobileOpen ? <X size={24} className="text-gray-700" /> : <Menu size={24} className="text-gray-700" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100 shadow-xl">
+          <div className="px-4 py-4 space-y-1">
+            {navLinks.map(link => (
+              <button
+                key={link.id}
+                onClick={() => navigate(link.id)}
+                className={`block w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                  currentPage === link.id ? 'bg-[#1e3a5f]/10 text-[#1e3a5f]' : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+            <hr className="my-2" />
+            <a href={`tel:${BRAND.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 px-4 py-3 text-[#e63946] font-semibold text-sm">
+              <Phone size={16} /> {BRAND.phone}
+            </a>
+            <button
+              onClick={() => { setShowAdmin(true); setCurrentPage('admin'); setMobileOpen(false); }}
+              className="flex items-center gap-2 px-4 py-3 text-gray-400 text-sm"
+            >
+              <Lock size={14} /> Administration
+            </button>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+// =============================================================================
+// HERO
+// =============================================================================
+const HeroSection = ({ setCurrentPage }) => (
+  <section className="pt-24 lg:pt-32 pb-16 lg:pb-24 bg-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <RevealSection>
+          <div>
+            <div className="inline-flex items-center gap-2 bg-[#1e3a5f]/10 text-[#1e3a5f] px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <ShieldCheck size={16} />
+              Garage de confiance depuis des annees
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1a1a2e] leading-tight mb-6">
+              Votre partenaire <span className="text-[#e63946]">auto</span> de confiance a{' '}
+              <span className="text-[#1e3a5f]">Billy-Berclau</span>
+            </h1>
+            <p className="text-lg text-gray-500 mb-8 max-w-lg">
+              Des vehicules d'occasion selectionnes, revises et garantis. Transparence, qualite et prix justes.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => { setCurrentPage('stock'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="bg-[#e63946] hover:bg-[#d62839] text-white px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 hover:shadow-xl hover:shadow-red-200 flex items-center gap-2"
+              >
+                Voir nos vehicules <ArrowRight size={18} />
+              </button>
+              <a
+                href={BRAND.phoneLink}
+                className="border-2 border-[#1e3a5f] text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white px-8 py-4 rounded-2xl font-bold text-base transition-all duration-200 flex items-center gap-2"
+              >
+                <Phone size={18} /> Nous appeler
+              </a>
+            </div>
+          </div>
+        </RevealSection>
+        <RevealSection delay={200}>
+          <div className="relative">
+            <div className="absolute -inset-4 bg-gradient-to-r from-[#1e3a5f]/20 to-[#e63946]/20 rounded-3xl blur-2xl"></div>
+            <img
+              src="https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop"
+              alt="Voiture d'occasion BRL Negoce Auto"
+              className="relative rounded-3xl shadow-2xl w-full object-cover aspect-[4/3]"
+            />
+            <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">A partir de</p>
+                <p className="text-2xl font-extrabold text-[#1e3a5f]">3 490 EUR</p>
+              </div>
+              <div className="flex items-center gap-1 text-yellow-500">
+                <Star size={18} className="fill-yellow-400" />
+                <span className="font-bold text-gray-800">{BRAND.rating}/5</span>
+              </div>
+            </div>
+          </div>
+        </RevealSection>
+      </div>
+    </div>
+  </section>
+);
+
+// =============================================================================
+// STATS BAND
+// =============================================================================
+const StatsBand = () => {
+  const stats = [
+    { icon: <Car size={24} />, value: "+750", label: "Ventes realisees" },
+    { icon: <Star size={24} />, value: "4.8/5", label: "Avis clients" },
+    { icon: <ShieldCheck size={24} />, value: "3 mois", label: "Garantie incluse" },
+    { icon: <FileText size={24} />, value: "Offerte", label: "Carte grise" }
+  ];
+
+  return (
+    <section className="bg-[#1e3a5f] py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          {stats.map((s, i) => (
+            <RevealSection key={i} delay={i * 100}>
+              <div className="flex items-center gap-4 text-white">
+                <div className="p-3 bg-white/10 rounded-xl">{s.icon}</div>
+                <div>
+                  <p className="text-2xl font-extrabold">{s.value}</p>
+                  <p className="text-sm text-white/70">{s.label}</p>
+                </div>
+              </div>
+            </RevealSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// =============================================================================
+// CAR CARD
+// =============================================================================
+const CarCard = ({ car, onClick }) => (
+  <div
+    onClick={onClick}
+    className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
+  >
+    <div className="relative overflow-hidden aspect-[4/3]">
+      <img
+        src={car.images?.[0] || "https://images.unsplash.com/photo-1549924231-f129b911e442?w=600&h=450&fit=crop"}
+        alt={`${car.marque} ${car.modele}`}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      />
+      <div className="absolute top-3 left-3 bg-[#e63946] text-white px-3 py-1 rounded-lg text-sm font-bold">
+        {formatPrice(car.prix)}
+      </div>
+      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-lg text-xs font-medium">
+        {car.annee}
+      </div>
+    </div>
+    <div className="p-5">
+      <h3 className="text-lg font-bold text-[#1a1a2e] mb-2">
+        {car.marque} {car.modele}
+      </h3>
+      <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+        <span className="flex items-center gap-1"><Gauge size={14} /> {formatKm(car.km)}</span>
+        <span className="flex items-center gap-1"><Fuel size={14} /> {car.carburant}</span>
+        <span className="flex items-center gap-1"><Cog size={14} /> {car.transmission}</span>
+      </div>
+      <div className="mt-4 flex items-center justify-between">
+        <span className="text-xs text-gray-400">{car.puissance}</span>
+        <span className="text-[#1e3a5f] font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+          Voir details <ChevronRight size={14} />
+        </span>
+      </div>
+    </div>
+  </div>
+);
+
+// =============================================================================
+// LATEST CARS SECTION
+// =============================================================================
+const LatestCarsSection = ({ cars, setCurrentPage, setSelectedCar }) => (
+  <section className="py-16 lg:py-24 bg-[#f8f9fa]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <RevealSection>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Derniers arrivages</h2>
+          <p className="text-gray-500 max-w-md mx-auto">Decouvrez nos vehicules d'occasion selectionnes et revises avec soin.</p>
+        </div>
+      </RevealSection>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {cars.slice(0, 6).map((car, i) => (
+          <RevealSection key={car.id} delay={i * 100}>
+            <CarCard
+              car={car}
+              onClick={() => { setSelectedCar(car); setCurrentPage('carDetail'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            />
+          </RevealSection>
+        ))}
+      </div>
+      {cars.length > 6 && (
+        <div className="text-center mt-10">
+          <button
+            onClick={() => { setCurrentPage('stock'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-8 py-3 rounded-xl font-semibold transition-all"
+          >
+            Voir tout le stock
+          </button>
+        </div>
+      )}
+    </div>
+  </section>
+);
+
+// =============================================================================
+// SERVICES SECTION
+// =============================================================================
+const ServicesSection = () => {
+  const services = [
+    { icon: <ShieldCheck size={28} />, title: "Garantie 3 mois", desc: "Tous nos vehicules sont couverts par une garantie de 3 mois minimum, pour votre tranquillite." },
+    { icon: <FileText size={28} />, title: "Carte grise offerte", desc: "Nous nous occupons de toutes les demarches administratives. Carte grise incluse dans le prix." },
+    { icon: <Handshake size={28} />, title: "Depot-vente", desc: "Vous souhaitez vendre votre vehicule ? Confiez-le-nous, on s'occupe de tout." },
+    { icon: <CreditCard size={28} />, title: "Financement", desc: "Solutions de financement adaptees a votre budget. Simulation gratuite sur place." }
+  ];
+
+  return (
+    <section className="py-16 lg:py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealSection>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Nos services</h2>
+            <p className="text-gray-500 max-w-md mx-auto">Un accompagnement complet, de l'achat a la mise en route.</p>
+          </div>
+        </RevealSection>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {services.map((s, i) => (
+            <RevealSection key={i} delay={i * 100}>
+              <div className="bg-[#f8f9fa] rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100">
+                <div className="inline-flex p-4 bg-[#1e3a5f]/10 rounded-2xl text-[#1e3a5f] mb-4">
+                  {s.icon}
+                </div>
+                <h3 className="text-lg font-bold text-[#1a1a2e] mb-2">{s.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
+              </div>
+            </RevealSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// =============================================================================
+// REVIEWS PREVIEW
+// =============================================================================
+const ReviewsPreview = ({ reviews, setCurrentPage }) => (
+  <section className="py-16 lg:py-24 bg-[#f8f9fa]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <RevealSection>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Ce que disent nos clients</h2>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <StarRating rating={5} size={20} />
+            <span className="text-lg font-bold text-[#1a1a2e]">{BRAND.rating}/5</span>
+          </div>
+          <p className="text-gray-500">Avis verifies de nos clients satisfaits</p>
+        </div>
+      </RevealSection>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {reviews.slice(0, 3).map((r, i) => (
+          <RevealSection key={r.id} delay={i * 100}>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all">
+              <StarRating rating={r.rating} />
+              <p className="text-gray-600 mt-4 mb-4 text-sm leading-relaxed">"{r.text}"</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#1e3a5f] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  {r.name.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1a1a2e] text-sm">{r.name}</p>
+                  <p className="text-xs text-gray-400">{new Date(r.date).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
+                </div>
+              </div>
+            </div>
+          </RevealSection>
+        ))}
+      </div>
+      <div className="text-center mt-10">
+        <button
+          onClick={() => { setCurrentPage('reviews'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          className="border-2 border-[#1e3a5f] text-[#1e3a5f] hover:bg-[#1e3a5f] hover:text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200"
+        >
+          Voir tous les avis
+        </button>
+      </div>
+    </div>
+  </section>
+);
+
+// =============================================================================
+// CTA SECTION
+// =============================================================================
+const CTASection = () => (
+  <section className="py-16 lg:py-24 bg-white">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <RevealSection>
+        <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">
+          Interesse par un vehicule ?
+        </h2>
+        <p className="text-gray-500 mb-8 max-w-lg mx-auto text-lg">
+          Contactez-nous pour plus d'informations ou pour planifier un essai. Nous sommes a votre disposition.
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <a
+            href={BRAND.phoneLink}
+            className="bg-[#e63946] hover:bg-[#d62839] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all hover:shadow-xl hover:shadow-red-200 flex items-center gap-2"
+          >
+            <Phone size={20} /> {BRAND.phone}
+          </a>
+          <a
+            href={`mailto:${BRAND.email}`}
+            className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all flex items-center gap-2"
+          >
+            <Mail size={20} /> Envoyer un email
+          </a>
+        </div>
+      </RevealSection>
+    </div>
+  </section>
+);
+
+// =============================================================================
+// MAP SECTION
+// =============================================================================
+const MapSection = () => (
+  <section className="py-16 lg:py-24 bg-[#f8f9fa]">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <RevealSection>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Ou nous trouver</h2>
+          <p className="text-gray-500 flex items-center justify-center gap-2">
+            <MapPin size={16} /> {BRAND.address}
+          </p>
+        </div>
+      </RevealSection>
+      <RevealSection>
+        <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10142.0!2d2.86!3d50.533!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47dd3091e1fbe64d%3A0x40af13e8163c4e0!2s62138%20Billy-Berclau!5e0!3m2!1sfr!2sfr!4v1"
+            width="100%"
+            height="400"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="BRL Negoce Auto - Billy-Berclau"
+          ></iframe>
+        </div>
+      </RevealSection>
+    </div>
+  </section>
+);
+
+// =============================================================================
+// FOOTER
+// =============================================================================
+const Footer = ({ setCurrentPage }) => {
+  const navigate = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <footer className="bg-[#1a1a2e] text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Brand */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-[#e63946] flex items-center justify-center">
+                <Car size={22} className="text-white" />
+              </div>
+              <div className="leading-tight">
+                <span className="text-xl font-extrabold">BRL</span>
+                <span className="block text-[10px] font-medium text-gray-400 tracking-widest uppercase">Negoce Auto</span>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              Votre specialiste en vehicules d'occasion a Billy-Berclau. Qualite, transparence et prix justes.
+            </p>
+          </div>
+
+          {/* Navigation */}
+          <div>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-300">Navigation</h4>
+            <ul className="space-y-2">
+              {[['Accueil', 'home'], ['Stock', 'stock'], ['A Propos', 'about'], ['Avis', 'reviews']].map(([label, page]) => (
+                <li key={page}>
+                  <button onClick={() => navigate(page)} className="text-sm text-gray-400 hover:text-white transition-colors">
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-300">Contact</h4>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li className="flex items-center gap-2"><Phone size={14} /> {BRAND.phone}</li>
+              <li className="flex items-center gap-2"><Mail size={14} /> {BRAND.email}</li>
+              <li className="flex items-start gap-2"><MapPin size={14} className="mt-0.5 shrink-0" /> {BRAND.address}</li>
+            </ul>
+          </div>
+
+          {/* Social */}
+          <div>
+            <h4 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-300">Suivez-nous</h4>
+            <a
+              href={BRAND.facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm transition-colors"
+            >
+              <Facebook size={18} /> Facebook
+            </a>
+            <div className="mt-4">
+              <div className="flex items-center gap-1 mb-1">
+                <StarRating rating={5} size={14} />
+                <span className="text-sm font-bold">{BRAND.rating}/5</span>
+              </div>
+              <p className="text-xs text-gray-500">Note moyenne clients</p>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-white/10 mt-10 pt-8 text-center text-xs text-gray-500">
+          &copy; {new Date().getFullYear()} BRL Negoce Auto - Tous droits reserves - Billy-Berclau 62138
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+// =============================================================================
+// HOME PAGE
+// =============================================================================
+const HomePage = ({ cars, reviews, setCurrentPage, setSelectedCar }) => (
+  <>
+    <HeroSection setCurrentPage={setCurrentPage} />
+    <StatsBand />
+    <LatestCarsSection cars={cars} setCurrentPage={setCurrentPage} setSelectedCar={setSelectedCar} />
+    <ServicesSection />
+    <ReviewsPreview reviews={reviews} setCurrentPage={setCurrentPage} />
+    <CTASection />
+    <MapSection />
+  </>
+);
+
+// =============================================================================
+// STOCK PAGE
+// =============================================================================
+const StockPage = ({ cars, setCurrentPage, setSelectedCar }) => {
+  const [search, setSearch] = useState('');
+  const filtered = cars.filter(c =>
+    `${c.marque} ${c.modele} ${c.annee}`.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealSection>
+          <div className="text-center mb-10">
+            <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Notre stock</h1>
+            <p className="text-gray-500 mb-6">Tous nos vehicules disponibles a la vente</p>
+            <div className="max-w-md mx-auto relative">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher un vehicule..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all"
+              />
+            </div>
+          </div>
+        </RevealSection>
+
+        {filtered.length === 0 ? (
+          <div className="text-center py-20 text-gray-400">
+            <Car size={48} className="mx-auto mb-4 opacity-30" />
+            <p className="text-lg">Aucun vehicule trouve.</p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filtered.map((car, i) => (
+              <RevealSection key={car.id} delay={i * 80}>
+                <CarCard
+                  car={car}
+                  onClick={() => { setSelectedCar(car); setCurrentPage('carDetail'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                />
+              </RevealSection>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+// =============================================================================
+// CAR DETAIL PAGE
+// =============================================================================
+const CarDetailPage = ({ car, setCurrentPage }) => {
+  const [activeImg, setActiveImg] = useState(0);
+  if (!car) return null;
+
+  const specs = car.specsKey ? MANUFACTURER_SPECS[car.specsKey] : null;
+
+  const identityItems = [
+    { label: "Marque", value: car.marque, icon: <Car size={16} /> },
+    { label: "Modele", value: car.modele, icon: <Info size={16} /> },
+    { label: "Annee", value: car.annee, icon: <Calendar size={16} /> },
+    { label: "Kilometrage", value: formatKm(car.km), icon: <Gauge size={16} /> },
+    { label: "Energie", value: car.carburant, icon: <Fuel size={16} /> },
+    { label: "Puissance", value: car.puissance, icon: <Cog size={16} /> },
+    { label: "Transmission", value: car.transmission, icon: <Settings size={16} /> },
+    { label: "Couleur", value: car.couleur, icon: <Palette size={16} /> },
+    { label: "Proprietaires", value: car.nbProprietaires, icon: <User size={16} /> },
+  ];
+
+  if (specs) {
+    identityItems.push(
+      { label: "Carrosserie", value: specs.carrosserie, icon: <Car size={16} /> },
+      { label: "Portes", value: specs.portes, icon: <DoorOpen size={16} /> },
+      { label: "Dimensions (L x l x h)", value: specs.dimensions, icon: <Ruler size={16} /> },
+      { label: "Poids a vide", value: specs.poids, icon: <Weight size={16} /> },
+      { label: "Volume coffre", value: specs.coffre, icon: <FileText size={16} /> },
+      { label: "Consommation mixte", value: specs.consoMixte, icon: <Fuel size={16} /> },
+      { label: "Emissions CO2", value: specs.co2, icon: <Leaf size={16} /> },
+      { label: "Norme Euro", value: specs.normeEuro, icon: <ShieldCheck size={16} /> }
+    );
+  }
+
+  return (
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back button */}
+        <button
+          onClick={() => { setCurrentPage('stock'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          className="flex items-center gap-2 text-[#1e3a5f] hover:text-[#162d4a] font-medium mb-6 transition-colors"
+        >
+          <ArrowLeft size={18} /> Retour au stock
+        </button>
+
+        <div className="grid lg:grid-cols-2 gap-8 mb-10">
+          {/* Gallery */}
+          <RevealSection>
+            <div>
+              <div className="rounded-2xl overflow-hidden shadow-lg mb-4 aspect-[4/3] bg-gray-200">
+                <img
+                  src={car.images?.[activeImg] || "https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop"}
+                  alt={`${car.marque} ${car.modele}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {car.images && car.images.length > 1 && (
+                <div className="flex gap-3">
+                  {car.images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImg(i)}
+                      className={`w-20 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImg ? 'border-[#e63946] shadow-md' : 'border-gray-200 opacity-60 hover:opacity-100'}`}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </RevealSection>
+
+          {/* Info */}
+          <RevealSection delay={200}>
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-2">
+                {car.marque} {car.modele}
+              </h1>
+              <p className="text-gray-500 mb-4 flex items-center gap-4">
+                <span className="flex items-center gap-1"><Calendar size={14} /> {car.annee}</span>
+                <span className="flex items-center gap-1"><Gauge size={14} /> {formatKm(car.km)}</span>
+                <span className="flex items-center gap-1"><Fuel size={14} /> {car.carburant}</span>
+              </p>
+              <div className="text-4xl font-extrabold text-[#e63946] mb-6">{formatPrice(car.prix)}</div>
+
+              <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
+                <h3 className="font-bold text-[#1a1a2e] mb-2">Description</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{car.description}</p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={BRAND.phoneLink}
+                  className="flex-1 min-w-[200px] bg-[#e63946] hover:bg-[#d62839] text-white px-6 py-4 rounded-2xl font-bold text-center transition-all hover:shadow-xl hover:shadow-red-200 flex items-center justify-center gap-2"
+                >
+                  <Phone size={18} /> Nous contacter
+                </a>
+                <a
+                  href={`mailto:${BRAND.email}?subject=Interet pour ${car.marque} ${car.modele} ${car.annee}`}
+                  className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-6 py-4 rounded-2xl font-bold text-center transition-all flex items-center justify-center gap-2"
+                >
+                  <Mail size={18} /> Email
+                </a>
+              </div>
+            </div>
+          </RevealSection>
+        </div>
+
+        {/* FICHE D'IDENTITE */}
+        <RevealSection>
+          <div className="bg-white rounded-2xl border-2 border-[#1e3a5f]/20 shadow-lg overflow-hidden">
+            <div className="bg-[#1e3a5f] px-6 py-4 flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <FileText size={20} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-extrabold text-white tracking-wide">FICHE D'IDENTITE DU VEHICULE</h2>
+                <p className="text-xs text-white/60">Carte technique - {car.marque} {car.modele} {car.annee}</p>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {identityItems.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-[#f8f9fa] rounded-xl border border-gray-100">
+                    <div className="p-2 bg-[#1e3a5f]/10 rounded-lg text-[#1e3a5f] shrink-0">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-400 uppercase tracking-wide">{item.label}</p>
+                      <p className="text-sm font-semibold text-[#1a1a2e] truncate">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-[#f8f9fa] px-6 py-3 text-xs text-gray-400 text-center border-t border-gray-100">
+              Donnees constructeur indicatives - BRL Negoce Auto - {BRAND.phone}
+            </div>
+          </div>
+        </RevealSection>
+      </div>
+    </section>
+  );
+};
+
+// =============================================================================
+// ABOUT PAGE
+// =============================================================================
+const AboutPage = () => (
+  <section className="pt-24 lg:pt-32 pb-16 bg-white min-h-screen">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <RevealSection>
+        <div className="text-center mb-12">
+          <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">A propos de BRL Negoce Auto</h1>
+          <p className="text-gray-500 max-w-xl mx-auto">
+            Votre garage de confiance pour l'achat de vehicules d'occasion a Billy-Berclau et ses environs.
+          </p>
+        </div>
+      </RevealSection>
+
+      <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+        <RevealSection>
+          <div className="rounded-2xl overflow-hidden shadow-lg aspect-[4/3] bg-gray-100">
+            <img
+              src="https://images.unsplash.com/photo-1486006920555-c77dcf18193c?w=800&h=600&fit=crop"
+              alt="Garage BRL Negoce Auto"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </RevealSection>
+        <RevealSection delay={200}>
+          <div>
+            <h2 className="text-2xl font-extrabold text-[#1a1a2e] mb-4">Notre histoire</h2>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              BRL Negoce Auto est un garage specialise dans la vente de vehicules d'occasion selectionnes avec soin. Implante a Billy-Berclau, nous mettons un point d'honneur a proposer des vehicules de qualite a des prix justes.
+            </p>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              Avec plus de 750 ventes realisees et une note de 4.8/5 sur les avis clients, notre reputation est notre meilleure carte de visite. Chaque vehicule est minutieusement inspecte et revise avant mise en vente.
+            </p>
+            <p className="text-gray-600 leading-relaxed">
+              Nous accompagnons chaque client dans son projet, de la selection du vehicule a la remise des cles, en passant par les demarches administratives.
+            </p>
+          </div>
+        </RevealSection>
+      </div>
+
+      {/* Values */}
+      <RevealSection>
+        <h2 className="text-2xl font-extrabold text-[#1a1a2e] text-center mb-8">Nos valeurs</h2>
+      </RevealSection>
+      <div className="grid sm:grid-cols-3 gap-6 mb-16">
+        {[
+          { icon: <Heart size={28} />, title: "Confiance", desc: "Des relations basees sur l'honnetete et la transparence totale." },
+          { icon: <Eye size={28} />, title: "Transparence", desc: "Historique complet, controle technique, aucune mauvaise surprise." },
+          { icon: <Award size={28} />, title: "Qualite", desc: "Vehicules soigneusement selectionnes et revises par nos soins." }
+        ].map((v, i) => (
+          <RevealSection key={i} delay={i * 100}>
+            <div className="text-center p-6 bg-[#f8f9fa] rounded-2xl border border-gray-100">
+              <div className="inline-flex p-4 bg-[#1e3a5f]/10 rounded-2xl text-[#1e3a5f] mb-4">{v.icon}</div>
+              <h3 className="text-lg font-bold text-[#1a1a2e] mb-2">{v.title}</h3>
+              <p className="text-sm text-gray-500">{v.desc}</p>
+            </div>
+          </RevealSection>
+        ))}
+      </div>
+
+      {/* Contact info */}
+      <RevealSection>
+        <div className="bg-[#1e3a5f] rounded-2xl p-8 text-white text-center">
+          <h2 className="text-2xl font-extrabold mb-6">Nos coordonnees</h2>
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div className="flex flex-col items-center gap-2">
+              <div className="p-3 bg-white/10 rounded-xl"><Phone size={22} /></div>
+              <p className="font-semibold">{BRAND.phone}</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="p-3 bg-white/10 rounded-xl"><Mail size={22} /></div>
+              <p className="font-semibold text-sm">{BRAND.email}</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="p-3 bg-white/10 rounded-xl"><MapPin size={22} /></div>
+              <p className="font-semibold text-sm">{BRAND.address}</p>
+            </div>
+          </div>
+        </div>
+      </RevealSection>
+    </div>
+  </section>
+);
+
+// =============================================================================
+// REVIEWS PAGE
+// =============================================================================
+const ReviewsPage = ({ reviews, setReviews }) => {
+  const [name, setName] = useState('');
+  const [text, setText] = useState('');
+  const [rating, setRating] = useState(5);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim() || !text.trim()) return;
+    const newReview = {
+      id: Date.now(),
+      name: name.trim(),
+      rating,
+      text: text.trim(),
+      date: new Date().toISOString().split('T')[0]
+    };
+    setReviews(prev => [newReview, ...prev]);
+    setName('');
+    setText('');
+    setRating(5);
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 3000);
+  };
+
+  return (
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <RevealSection>
+          <div className="text-center mb-10">
+            <h1 className="text-3xl lg:text-4xl font-extrabold text-[#1a1a2e] mb-4">Avis clients</h1>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <StarRating rating={5} size={22} />
+              <span className="text-xl font-bold text-[#1a1a2e]">{BRAND.rating}/5</span>
+            </div>
+            <p className="text-gray-500">{reviews.length} avis</p>
+          </div>
+        </RevealSection>
+
+        {/* Form */}
+        <RevealSection>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-10">
+            <h2 className="text-xl font-bold text-[#1a1a2e] mb-4 flex items-center gap-2">
+              <MessageSquare size={20} /> Laisser un avis
+            </h2>
+            {submitted && (
+              <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl mb-4 flex items-center gap-2 text-sm">
+                <CheckCircle2 size={16} /> Merci pour votre avis !
+              </div>
+            )}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Votre nom</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="Jean D."
+                    required
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Note</label>
+                  <div className="flex gap-1 mt-2">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setRating(i)}
+                        className="transition-transform hover:scale-110"
+                      >
+                        <Star
+                          size={28}
+                          className={i <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Votre avis</label>
+                <textarea
+                  value={text}
+                  onChange={e => setText(e.target.value)}
+                  placeholder="Partagez votre experience..."
+                  required
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all resize-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="bg-[#1e3a5f] hover:bg-[#162d4a] text-white px-8 py-3 rounded-xl font-semibold transition-all"
+              >
+                Publier mon avis
+              </button>
+            </form>
+          </div>
+        </RevealSection>
+
+        {/* Reviews list */}
+        <div className="space-y-4">
+          {reviews.map((r, i) => (
+            <RevealSection key={r.id} delay={i * 80}>
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#1e3a5f] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      {r.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[#1a1a2e]">{r.name}</p>
+                      <p className="text-xs text-gray-400">
+                        {new Date(r.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                  <StarRating rating={r.rating} />
+                </div>
+                <p className="text-gray-600 text-sm leading-relaxed">"{r.text}"</p>
+              </div>
+            </RevealSection>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// =============================================================================
+// ADMIN PAGE
+// =============================================================================
+const AdminPage = ({ cars, setCars }) => {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({
+    marque: '', modele: '', annee: '', prix: '', km: '',
+    carburant: 'Essence', transmission: 'Manuelle', puissance: '',
+    couleur: '', nbProprietaires: 1, description: '',
+    portes: 5, carrosserie: 'Citadine',
+    dimensions: '', poids: '', coffre: '', consoMixte: '',
+    co2: '', normeEuro: 'Euro 5'
+  });
+  const [images, setImages] = useState([]);
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === 'Brlnegoce62138!') {
+      setLoggedIn(true);
+      setError('');
+    } else {
+      setError('Mot de passe incorrect');
+    }
+  };
+
+  const handleImageUpload = (files) => {
+    const fileArray = Array.from(files);
+    fileArray.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewCar(prev => ({
-          ...prev,
-          images: [...prev.images, reader.result]
-        }));
+        setImages(prev => [...prev, reader.result]);
       };
       reader.readAsDataURL(file);
     });
   };
 
-  const removeImage = (index) => {
-    setNewCar(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    handleImageUpload(e.dataTransfer.files);
   };
 
-  const handleAddCar = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const carToAdd = {
-      ...newCar,
+    if (!form.marque || !form.modele || !form.annee || !form.prix) return;
+
+    const specsKey = `${form.marque.toLowerCase()}_${form.modele.toLowerCase()}_${form.annee}`;
+
+    // Add manufacturer specs if provided
+    if (form.dimensions || form.poids || form.coffre || form.consoMixte || form.co2) {
+      MANUFACTURER_SPECS[specsKey] = {
+        carrosserie: form.carrosserie,
+        portes: parseInt(form.portes) || 5,
+        dimensions: form.dimensions,
+        poids: form.poids,
+        coffre: form.coffre,
+        consoMixte: form.consoMixte,
+        co2: form.co2,
+        normeEuro: form.normeEuro
+      };
+    }
+
+    const newCar = {
       id: Date.now(),
-      images: newCar.images.length > 0 ? newCar.images : ["https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200"],
-      specs: { transmission: newCar.transmission, power: newCar.power, color: newCar.color, owners: "1" }
+      marque: form.marque,
+      modele: form.modele,
+      annee: parseInt(form.annee),
+      prix: parseInt(form.prix),
+      km: parseInt(form.km) || 0,
+      carburant: form.carburant,
+      transmission: form.transmission,
+      puissance: form.puissance,
+      couleur: form.couleur,
+      nbProprietaires: parseInt(form.nbProprietaires) || 1,
+      description: form.description,
+      images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop"],
+      specsKey: (form.dimensions || form.poids) ? specsKey : null
     };
-    setCars([carToAdd, ...cars]);
-    setNewCar({ brand: "", model: "", year: "", price: "", km: "", fuel: "Essence", images: [], description: "", transmission: "Automatique", power: "", color: "" });
-    setView('inventory');
-    window.scrollTo(0, 0);
+
+    setCars(prev => [newCar, ...prev]);
+    setForm({
+      marque: '', modele: '', annee: '', prix: '', km: '',
+      carburant: 'Essence', transmission: 'Manuelle', puissance: '',
+      couleur: '', nbProprietaires: 1, description: '',
+      portes: 5, carrosserie: 'Citadine',
+      dimensions: '', poids: '', coffre: '', consoMixte: '',
+      co2: '', normeEuro: 'Euro 5'
+    });
+    setImages([]);
+    setShowForm(false);
   };
 
-  const handleAddReview = (e) => {
-    e.preventDefault();
-    const reviewToAdd = { ...newReview, id: Date.now(), date: "À l'instant" };
-    setReviews([reviewToAdd, ...reviews]);
-    setNewReview({ author: "", text: "", rating: 5 });
+  const deleteCar = (id) => {
+    if (window.confirm('Supprimer ce vehicule ?')) {
+      setCars(prev => prev.filter(c => c.id !== id));
+    }
   };
 
-  const openDetail = (car) => {
-    setSelectedCar(car);
-    setActiveImageIndex(0);
-    setView('detail');
-    window.scrollTo(0, 0);
-  };
+  // Login screen
+  if (!loggedIn) {
+    return (
+      <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen flex items-center justify-center">
+        <div className="w-full max-w-md px-4">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+            <div className="text-center mb-6">
+              <div className="inline-flex p-4 bg-[#1e3a5f]/10 rounded-2xl mb-4">
+                <Lock size={28} className="text-[#1e3a5f]" />
+              </div>
+              <h1 className="text-2xl font-extrabold text-[#1a1a2e]">Administration</h1>
+              <p className="text-sm text-gray-500 mt-1">Acces reserve au gerant</p>
+            </div>
+            <form onSubmit={handleLogin} className="space-y-4">
+              {error && (
+                <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                  <X size={16} /> {error}
+                </div>
+              )}
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Mot de passe"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all"
+              />
+              <button type="submit" className="w-full bg-[#1e3a5f] hover:bg-[#162d4a] text-white py-3 rounded-xl font-semibold transition-all">
+                Se connecter
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  const handleAdminLogin = (e) => {
-    e.preventDefault();
-    if(adminPass === ADMIN_SECRET) {
-      setIsAdmin(true);
-    } else {
-      alert("Mot de passe incorrect");
+  // Admin dashboard
+  return (
+    <section className="pt-24 lg:pt-32 pb-16 bg-[#f8f9fa] min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-[#1a1a2e]">Tableau de bord</h1>
+            <p className="text-gray-500 text-sm">{cars.length} vehicule(s) en stock</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="bg-[#e63946] hover:bg-[#d62839] text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2"
+            >
+              {showForm ? <X size={18} /> : <Plus size={18} />}
+              {showForm ? 'Annuler' : 'Ajouter un vehicule'}
+            </button>
+            <button
+              onClick={() => setLoggedIn(false)}
+              className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all text-sm font-medium"
+            >
+              Deconnexion
+            </button>
+          </div>
+        </div>
+
+        {/* Add form */}
+        {showForm && (
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+            <h2 className="text-xl font-bold text-[#1a1a2e] mb-6">Nouveau vehicule</h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Main info */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Informations generales</h3>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { key: 'marque', label: 'Marque *', placeholder: 'Renault', type: 'text' },
+                    { key: 'modele', label: 'Modele *', placeholder: 'Clio', type: 'text' },
+                    { key: 'annee', label: 'Annee *', placeholder: '2020', type: 'number' },
+                    { key: 'prix', label: 'Prix (EUR) *', placeholder: '5990', type: 'number' },
+                    { key: 'km', label: 'Kilometres', placeholder: '80000', type: 'number' },
+                    { key: 'puissance', label: 'Puissance', placeholder: '75 ch', type: 'text' },
+                    { key: 'couleur', label: 'Couleur', placeholder: 'Gris', type: 'text' },
+                    { key: 'nbProprietaires', label: 'Nb proprietaires', placeholder: '1', type: 'number' }
+                  ].map(field => (
+                    <div key={field.key}>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">{field.label}</label>
+                      <input
+                        type={field.type}
+                        value={form[field.key]}
+                        onChange={e => setForm(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                        required={field.label.includes('*')}
+                      />
+                    </div>
+                  ))}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Carburant</label>
+                    <select
+                      value={form.carburant}
+                      onChange={e => setForm(prev => ({ ...prev, carburant: e.target.value }))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                    >
+                      <option>Essence</option>
+                      <option>Diesel</option>
+                      <option>Hybride</option>
+                      <option>Electrique</option>
+                      <option>GPL</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Transmission</label>
+                    <select
+                      value={form.transmission}
+                      onChange={e => setForm(prev => ({ ...prev, transmission: e.target.value }))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                    >
+                      <option>Manuelle</option>
+                      <option>Automatique</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Specs constructeur */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Donnees constructeur (optionnel)</h3>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Type carrosserie</label>
+                    <select
+                      value={form.carrosserie}
+                      onChange={e => setForm(prev => ({ ...prev, carrosserie: e.target.value }))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                    >
+                      <option>Citadine</option>
+                      <option>Berline</option>
+                      <option>SUV</option>
+                      <option>Break</option>
+                      <option>Monospace</option>
+                      <option>Coupe</option>
+                      <option>Cabriolet</option>
+                      <option>Utilitaire</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Nb portes</label>
+                    <select
+                      value={form.portes}
+                      onChange={e => setForm(prev => ({ ...prev, portes: e.target.value }))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                    >
+                      <option>3</option>
+                      <option>5</option>
+                    </select>
+                  </div>
+                  {[
+                    { key: 'dimensions', label: 'Dimensions (L x l x h)', placeholder: '4200 x 1800 x 1500 mm' },
+                    { key: 'poids', label: 'Poids a vide', placeholder: '1100 kg' },
+                    { key: 'coffre', label: 'Volume coffre', placeholder: '350 L' },
+                    { key: 'consoMixte', label: 'Conso mixte', placeholder: '5.5 L/100km' },
+                    { key: 'co2', label: 'Emissions CO2', placeholder: '129 g/km' },
+                  ].map(field => (
+                    <div key={field.key}>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">{field.label}</label>
+                      <input
+                        type="text"
+                        value={form[field.key]}
+                        onChange={e => setForm(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                      />
+                    </div>
+                  ))}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Norme Euro</label>
+                    <select
+                      value={form.normeEuro}
+                      onChange={e => setForm(prev => ({ ...prev, normeEuro: e.target.value }))}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all text-sm"
+                    >
+                      <option>Euro 3</option>
+                      <option>Euro 4</option>
+                      <option>Euro 5</option>
+                      <option>Euro 6</option>
+                      <option>Euro 6d</option>
+                      <option>Euro 7</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Images */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Photos</h3>
+                <div
+                  onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
+                    dragOver ? 'border-[#1e3a5f] bg-[#1e3a5f]/5' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <Upload size={32} className="mx-auto text-gray-300 mb-3" />
+                  <p className="text-sm text-gray-500 mb-2">Glissez-deposez vos photos ici</p>
+                  <label className="inline-block bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-medium cursor-pointer transition-colors">
+                    Parcourir
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={e => handleImageUpload(e.target.files)}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                {images.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mt-4">
+                    {images.map((img, i) => (
+                      <div key={i} className="relative group">
+                        <img src={img} alt="" className="w-20 h-16 object-cover rounded-xl border border-gray-200" />
+                        <button
+                          type="button"
+                          onClick={() => setImages(prev => prev.filter((_, idx) => idx !== i))}
+                          className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
+                <textarea
+                  value={form.description}
+                  onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Decrivez le vehicule..."
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]/20 focus:border-[#1e3a5f] transition-all resize-none text-sm"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="bg-[#e63946] hover:bg-[#d62839] text-white px-8 py-3 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-red-200"
+              >
+                Ajouter le vehicule
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Cars list */}
+        <div className="space-y-4">
+          {cars.map(car => (
+            <div key={car.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+              <img
+                src={car.images?.[0] || "https://images.unsplash.com/photo-1549924231-f129b911e442?w=200&h=150&fit=crop"}
+                alt={`${car.marque} ${car.modele}`}
+                className="w-24 h-18 object-cover rounded-xl shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-[#1a1a2e]">{car.marque} {car.modele}</h3>
+                <p className="text-sm text-gray-500">{car.annee} - {formatKm(car.km)} - {car.carburant}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-lg font-extrabold text-[#e63946]">{formatPrice(car.prix)}</p>
+                <button
+                  onClick={() => deleteCar(car.id)}
+                  className="text-gray-400 hover:text-red-500 transition-colors mt-1"
+                  title="Supprimer"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// =============================================================================
+// MAIN APP
+// =============================================================================
+export default function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [cars, setCars] = useState(INITIAL_CARS);
+  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+  const [selectedCar, setSelectedCar] = useState(null);
+  const [showAdmin, setShowAdmin] = useState(false);
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return <HomePage cars={cars} reviews={reviews} setCurrentPage={setCurrentPage} setSelectedCar={setSelectedCar} />;
+      case 'stock':
+        return <StockPage cars={cars} setCurrentPage={setCurrentPage} setSelectedCar={setSelectedCar} />;
+      case 'carDetail':
+        return <CarDetailPage car={selectedCar} setCurrentPage={setCurrentPage} />;
+      case 'about':
+        return <AboutPage />;
+      case 'reviews':
+        return <ReviewsPage reviews={reviews} setReviews={setReviews} />;
+      case 'admin':
+        return <AdminPage cars={cars} setCars={setCars} />;
+      default:
+        return <HomePage cars={cars} reviews={reviews} setCurrentPage={setCurrentPage} setSelectedCar={setSelectedCar} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-[#bef264] selection:text-black font-sans pb-20 custom-scrollbar">
-      
-      {/* --- NAVBAR --- */}
-      <nav className={`fixed top-0 w-full z-[100] transition-all duration-300 px-6 py-4 ${scrolled || view !== 'home' ? 'bg-black/80 backdrop-blur-xl border-b border-white/10' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <button onClick={() => setView('home')} className="flex items-center gap-4 group">
-            <BRLLogo size="md" />
-            <div className="flex flex-col leading-none text-left">
-              <span className="text-white font-black italic text-xl tracking-tighter uppercase">
-                BRL <span className="text-[#bef264]">NÉGOCE</span>
-              </span>
-              <span className="text-[10px] text-white/50 font-bold tracking-[0.3em] uppercase">PREMIUM AUTO</span>
-            </div>
-          </button>
-          
-          <div className="hidden lg:flex items-center gap-8">
-            <button onClick={() => setView('home')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'home' ? 'text-[#bef264]' : 'text-white'}`}>Accueil</button>
-            <button onClick={() => setView('inventory')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'inventory' ? 'text-[#bef264]' : 'text-white'}`}>Inventaire</button>
-            <button onClick={() => setView('about')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'about' ? 'text-[#bef264]' : 'text-white'}`}>À Propos</button>
-            <button onClick={() => setView('reviews')} className={`text-sm font-bold uppercase tracking-widest hover:text-[#bef264] transition-colors ${view === 'reviews' ? 'text-[#bef264]' : 'text-white'}`}>Avis</button>
-            <button onClick={() => setView('admin')} className={`text-white/30 hover:text-white transition-colors ${view === 'admin' ? 'text-[#bef264]' : ''}`}><Lock size={18} /></button>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a href={BRAND.facebookUrl} target="_blank" rel="noopener noreferrer" className="p-2 text-white/50 hover:text-[#bef264] transition-colors">
-              <Facebook size={20} />
-            </a>
-            <a href={`tel:${BRAND.phone}`} className="hidden md:flex bg-[#bef264] text-black px-6 py-2.5 rounded-lg font-black text-xs uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_15px_rgba(190,242,100,0.2)]">
-              NOUS APPELER
-            </a>
-          </div>
-        </div>
-      </nav>
-
-      {/* --- VIEW: HOME --- */}
-      {view === 'home' && (
-        <>
-          <section className="relative h-screen flex items-center pt-20 px-6 overflow-hidden">
-            <div className="absolute inset-0 z-0">
-              <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2000" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
-            </div>
-            <div className="max-w-7xl mx-auto w-full relative z-10">
-              <div className="flex flex-col gap-6 mb-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#bef264]/10 border border-[#bef264]/20 text-[#bef264] text-[9px] font-black uppercase tracking-[0.3em] w-fit">
-                  <CheckCircle2 size={12} /> Service Carte Grise Disponible
-                </div>
-                {/* --- RATING --- */}
-                <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl w-fit">
-                  <div className="flex gap-1 text-[#bef264]">
-                    {[1,2,3,4,5].map(i => <Star key={i} size={14} fill={i <= 4 ? "currentColor" : "currentColor"} className={i === 5 ? "opacity-50" : ""} />)}
-                  </div>
-                  <span className="text-white font-black italic text-sm">{BRAND.rating}/5</span>
-                  <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Avis Clients</span>
-                </div>
-              </div>
-              
-              <h1 className="text-5xl md:text-8xl font-black text-white leading-[1.1] mb-8 uppercase tracking-tighter italic">
-                L'Excellence <br/>
-                <span className="text-[#bef264]">Automobile.</span>
-              </h1>
-              <p className="text-slate-300 text-lg md:text-xl font-medium mb-10 max-w-xl italic border-l-4 border-[#bef264] pl-6">
-                Votre partenaire de confiance à Billy-Berclau pour l'achat et la vente de véhicules premium sélectionnés.
-              </p>
-              <div className="flex gap-4">
-                <button onClick={() => setView('inventory')} className="bg-[#bef264] text-black px-10 py-5 rounded-lg font-black text-sm uppercase tracking-widest hover:bg-white transition-all shadow-[0_10px_30px_rgba(190,242,100,0.3)]">
-                  DÉCOUVRIR LE STOCK
-                </button>
-              </div>
-            </div>
-            
-            <div className="absolute bottom-0 left-0 w-full bg-white py-4 overflow-hidden hidden md:block border-t border-white/10 shadow-[0_-10px_30px_rgba(255,255,255,0.05)]">
-              <div className="flex justify-center items-center gap-12 animate-infinite-scroll whitespace-nowrap text-[#bef264] font-black text-lg uppercase italic text-stroke-black">
-                {[1,2,3,4,5,6,7,8].map(i => (
-                  <div key={i} className="flex items-center gap-12">
-                    <span>Transparence Totale</span> <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
-                    <span>Prix Justes</span> <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
-                    <span>Garantie 3 Mois</span> <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Featured Grid */}
-          <section className="py-24 px-6 max-w-7xl mx-auto">
-            <h2 className="text-4xl font-black mb-12 uppercase italic">Derniers <span className="text-[#bef264]">Arrivages</span></h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {cars.slice(0, 2).map(car => (
-                <div key={car.id} onClick={() => openDetail(car)} className="group cursor-pointer bg-[#111] rounded-[40px] overflow-hidden border border-white/5 hover:border-[#bef264]/50 transition-all duration-500">
-                  <div className="relative h-80 overflow-hidden">
-                    <img src={car.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute bottom-6 right-6 bg-[#bef264] text-black px-6 py-2 rounded-xl font-black text-xl italic shadow-xl">{Number(car.price).toLocaleString()} €</div>
-                  </div>
-                  <div className="p-8">
-                    <p className="text-[#bef264] text-xs font-black uppercase tracking-widest mb-2">{car.brand}</p>
-                    <h3 className="text-3xl font-black uppercase italic">{car.model}</h3>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Services Section */}
-          <section className="py-24 px-6 bg-black/50 border-y border-white/5">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                { icon: <ShieldCheck size={32} />, title: "Garantie 3 Mois", desc: "Révisés et garantis, extension possible." },
-                { icon: <Award size={32} />, title: "Gestion ANTS", desc: "Accompagnement pour votre carte grise." },
-                { icon: <Zap size={32} />, title: "750+ Ventes", desc: "Une expertise prouvée par nos clients." },
-                { icon: <Handshake size={32} />, title: "Dépôt-Vente", desc: "Confiez-nous votre véhicule en toute sécurité." }
-              ].map((item, i) => (
-                <div key={i} className="flex flex-col items-center text-center p-10 rounded-[40px] bg-[#111] border border-white/5 hover:border-[#bef264]/30 transition-all group">
-                  <div className="text-[#bef264] mb-6 group-hover:scale-110 transition-transform">{item.icon}</div>
-                  <h4 className="text-white font-black uppercase italic mb-3 tracking-tighter text-lg">{item.title}</h4>
-                  <p className="text-slate-500 text-sm font-medium italic leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* --- REVIEWS SECTION ON HOME --- */}
-          <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl font-black uppercase italic mb-4">L'Avis de nos <span className="text-[#bef264]">Clients</span></h2>
-              <div className="flex items-center justify-center gap-4 mb-4">
-                 <div className="flex gap-1 text-[#bef264]">
-                   {[1,2,3,4,5].map(i => <Star key={i} size={20} fill="currentColor" />)}
-                 </div>
-                 <span className="text-2xl font-black italic">{BRAND.rating}/5</span>
-              </div>
-              <p className="text-slate-500 font-bold uppercase tracking-widest italic">Retrouvez les témoignages de ceux qui nous ont fait confiance.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-              {reviews.map(review => (
-                <div key={review.id} className="bg-[#111] p-10 rounded-[40px] border border-white/5 relative group hover:border-[#bef264]/30 transition-all">
-                  <div className="flex gap-1 text-[#bef264] mb-6">
-                    {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                  </div>
-                  <p className="text-white font-medium italic mb-8 leading-relaxed">"{review.text}"</p>
-                  <div className="flex items-center gap-4 border-t border-white/5 pt-8">
-                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[#bef264]">
-                      <User size={24} />
-                    </div>
-                    <div>
-                      <h4 className="font-black uppercase italic text-sm">{review.author}</h4>
-                      <p className="text-slate-500 text-[10px] font-bold uppercase">{review.date}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-white p-12 md:p-20 rounded-[60px]">
-              <h3 className="text-black text-3xl font-black uppercase italic mb-10 text-center">Laissez-nous <span className="text-slate-400">votre avis</span></h3>
-              <form onSubmit={handleAddReview} className="max-w-2xl mx-auto space-y-6">
-                <input required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre Nom" value={newReview.author} onChange={e => setNewReview({...newReview, author: e.target.value})} />
-                <textarea required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black h-32 placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre message..." value={newReview.text} onChange={e => setNewReview({...newReview, text: e.target.value})}></textarea>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-500 font-bold uppercase text-xs">Note :</span>
-                    {[1,2,3,4,5].map(star => (
-                      <button key={star} type="button" onClick={() => setNewReview({...newReview, rating: star})} className={`transition-transform hover:scale-125 ${newReview.rating >= star ? 'text-[#bef264]' : 'text-slate-300'}`}>
-                        <Star size={24} fill={newReview.rating >= star ? "currentColor" : "none"} />
-                      </button>
-                    ))}
-                  </div>
-                  <button type="submit" className="bg-black text-white px-8 py-4 rounded-xl font-black uppercase italic hover:bg-[#bef264] hover:text-black transition-all">Envoyer</button>
-                </div>
-              </form>
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* --- VIEW: INVENTORY --- */}
-      {view === 'inventory' && (
-        <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black uppercase italic mb-4">Notre <span className="text-[#bef264]">Stock</span></h2>
-            <p className="text-slate-500 font-bold uppercase tracking-widest italic">Tous nos véhicules sont révisés et garantis.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cars.map(car => (
-              <div key={car.id} onClick={() => openDetail(car)} className="group cursor-pointer bg-[#111] border border-white/5 rounded-[40px] overflow-hidden hover:border-[#bef264]/50 transition-all duration-500">
-                <div className="relative h-64 overflow-hidden">
-                  <img src={car.images[0]} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md text-white px-4 py-1 rounded-full text-xs font-black italic">{car.year}</div>
-                </div>
-                <div className="p-8">
-                  <span className="text-[#bef264] text-[10px] font-black uppercase tracking-widest mb-2 block">{car.brand}</span>
-                  <h3 className="text-2xl font-black uppercase italic mb-6">{car.model}</h3>
-                  <div className="flex justify-between items-center border-t border-white/5 pt-6">
-                    <span className="text-2xl font-black italic">{Number(car.price).toLocaleString()} €</span>
-                    <div className="p-3 bg-white/5 rounded-2xl group-hover:bg-[#bef264] group-hover:text-black transition-all shadow-[0_0_15px_rgba(190,242,100,0.1)]">
-                      <ArrowUpRight size={20} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* --- VIEW: ABOUT --- */}
-      {view === 'about' && (
-        <section className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
-          <div className="bg-[#111] rounded-[60px] border border-white/5 p-12 md:p-20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-10 opacity-5">
-              <Quote size={200} className="text-[#bef264]" />
-            </div>
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic mb-12 leading-none relative z-10">
-              Notre <span className="text-[#bef264]">Histoire</span>
-            </h2>
-            <div className="space-y-8 text-slate-300 text-lg md:text-xl font-medium leading-relaxed italic relative z-10">
-              <p>
-                Depuis l'ouverture de <span className="text-white font-black">BRL NÉGOCE AUTO</span>, notre mission première n'a jamais changé : satisfaire nos clients en leur proposant une expérience d'achat transparente et sereine.
-              </p>
-              <p>
-                Passionnés par l'automobile, nous sélectionnons chaque véhicule de notre parc avec la plus grande rigueur. Chaque voiture est minutieusement inspectée, révisée et préparée pour garantir votre sécurité et votre plaisir de conduire.
-              </p>
-              <p>
-                Nous croyons qu'un achat automobile est avant tout une relation de confiance. C'est pourquoi nous vous accompagnons à chaque étape, du choix de votre véhicule aux démarches administratives de carte grise, pour que vous n'ayez qu'une chose à faire : profiter de votre nouvelle route.
-              </p>
-              <div className="pt-8 flex items-center gap-4 text-[#bef264]">
-                <div className="h-[2px] w-20 bg-[#bef264]"></div>
-                <span className="uppercase font-black tracking-widest text-sm italic">L'Équipe BRL NÉGOCE AUTO</span>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* --- VIEW: REVIEWS --- */}
-      {view === 'reviews' && (
-        <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-black uppercase italic mb-4">L'Avis de nos <span className="text-[#bef264]">Clients</span></h2>
-            <div className="flex items-center justify-center gap-4 mb-4">
-               <div className="flex gap-1 text-[#bef264]">
-                 {[1,2,3,4,5].map(i => <Star key={i} size={20} fill="currentColor" />)}
-               </div>
-               <span className="text-2xl font-black italic">{BRAND.rating}/5</span>
-            </div>
-            <p className="text-slate-500 font-bold uppercase tracking-widest italic">Retrouvez les témoignages de ceux qui nous ont fait confiance.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-            {reviews.map(review => (
-              <div key={review.id} className="bg-[#111] p-10 rounded-[40px] border border-white/5 relative group hover:border-[#bef264]/30 transition-all">
-                <div className="flex gap-1 text-[#bef264] mb-6">
-                  {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                </div>
-                <p className="text-white font-medium italic mb-8 leading-relaxed">"{review.text}"</p>
-                <div className="flex items-center gap-4 border-t border-white/5 pt-8">
-                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[#bef264]">
-                    <User size={24} />
-                  </div>
-                  <div>
-                    <h4 className="font-black uppercase italic text-sm">{review.author}</h4>
-                    <p className="text-slate-500 text-[10px] font-bold uppercase">{review.date}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-white p-12 md:p-20 rounded-[60px]">
-            <h3 className="text-black text-3xl font-black uppercase italic mb-10 text-center">Laissez-nous <span className="text-slate-400">votre avis</span></h3>
-            <form onSubmit={handleAddReview} className="max-w-2xl mx-auto space-y-6">
-              <input required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre Nom" value={newReview.author} onChange={e => setNewReview({...newReview, author: e.target.value})} />
-              <textarea required className="w-full bg-slate-100 border-none rounded-2xl p-4 text-black h-32 placeholder-slate-400 focus:ring-2 focus:ring-[#bef264] outline-none transition-all" placeholder="Votre message..." value={newReview.text} onChange={e => setNewReview({...newReview, text: e.target.value})}></textarea>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-slate-500 font-bold uppercase text-xs">Note :</span>
-                  {[1,2,3,4,5].map(star => (
-                    <button key={star} type="button" onClick={() => setNewReview({...newReview, rating: star})} className={`transition-transform hover:scale-125 ${newReview.rating >= star ? 'text-[#bef264]' : 'text-slate-300'}`}>
-                      <Star size={24} fill={newReview.rating >= star ? "currentColor" : "none"} />
-                    </button>
-                  ))}
-                </div>
-                <button type="submit" className="bg-black text-white px-8 py-4 rounded-xl font-black uppercase italic hover:bg-[#bef264] hover:text-black transition-all">Envoyer</button>
-              </div>
-            </form>
-          </div>
-        </section>
-      )}
-
-      {/* --- VIEW: DETAIL --- */}
-      {view === 'detail' && selectedCar && (
-        <section className="pt-32 pb-24 px-6 max-w-7xl mx-auto">
-          <button onClick={() => setView('inventory')} className="flex items-center gap-2 text-[#bef264] font-black uppercase text-xs mb-12 hover:translate-x-[-4px] transition-transform group">
-            <ChevronLeft size={16} className="group-hover:scale-110 transition-transform" /> RETOUR AU STOCK
-          </button>
-
-          <div className="bg-[#111] rounded-[60px] border border-white/5 overflow-hidden shadow-2xl">
-            <div className="bg-white p-12 md:px-20 flex flex-col md:flex-row justify-between items-center gap-8">
-              <div>
-                <h2 className="text-black text-4xl md:text-6xl font-black uppercase italic leading-none tracking-tighter">
-                  {selectedCar.brand} <br/>
-                  <span className="text-slate-400">{selectedCar.model}</span>
-                </h2>
-              </div>
-              <div className="text-black text-4xl md:text-6xl font-black italic tracking-tighter">
-                {Number(selectedCar.price).toLocaleString()} €
-              </div>
-            </div>
-
-            <div className="p-8 md:p-20 grid grid-cols-1 lg:grid-cols-2 gap-16">
-              <div className="space-y-6">
-                <div className="aspect-video rounded-[40px] overflow-hidden border border-white/10 bg-black shadow-inner">
-                  <img src={selectedCar.images[activeImageIndex]} className="w-full h-full object-cover animate-in fade-in zoom-in duration-500" />
-                </div>
-                {/* --- DYNAMIC MULTI-PHOTO GALLERY --- */}
-                <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar-thin">
-                  {selectedCar.images.map((img, i) => (
-                    <button key={i} onClick={() => setActiveImageIndex(i)} className={`w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all shrink-0 ${activeImageIndex === i ? 'border-[#bef264] scale-105 shadow-lg shadow-[#bef264]/20' : 'border-transparent opacity-50 hover:opacity-100'}`}>
-                      <img src={img} className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-12">
-                {/* --- PROFESSIONAL DESCRIPTION LAYOUT --- */}
-                <div className="bg-white/5 p-10 rounded-[40px] border border-white/10 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-6 opacity-5"><Info size={80} /></div>
-                  <h4 className="text-[#bef264] font-black uppercase text-xs tracking-[0.3em] mb-8 italic flex items-center gap-2">
-                    <span className="w-8 h-[1px] bg-[#bef264]"></span> DESCRIPTION DÉTAILLÉE
-                  </h4>
-                  <div className="text-slate-300 font-medium leading-relaxed italic text-lg whitespace-pre-line space-y-4">
-                    {selectedCar.description || "Aucune description disponible pour ce véhicule."}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { label: "Kilométrage", value: `${Number(selectedCar.km).toLocaleString()} KM`, icon: <Gauge size={20}/> },
-                    { label: "Année", value: selectedCar.year, icon: <Calendar size={20}/> },
-                    { label: "Carburant", value: selectedCar.fuel, icon: <Fuel size={20}/> },
-                    { label: "Boite", value: selectedCar.specs?.transmission || "Automatique", icon: <Settings size={20}/> },
-                  ].map((item, i) => (
-                    <div key={i} className="bg-white/5 p-8 rounded-[35px] border border-white/10 flex items-center gap-5 hover:border-[#bef264]/30 transition-colors group">
-                      <div className="text-[#bef264] group-hover:scale-110 transition-transform">{item.icon}</div>
-                      <div>
-                        <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{item.label}</p>
-                        <p className="text-lg font-black italic">{item.value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <a href={`tel:${BRAND.phone}`} className="w-full bg-[#bef264] text-black py-8 rounded-[40px] font-black uppercase italic text-xl text-center block hover:scale-[1.02] transition-all shadow-2xl shadow-[#bef264]/30">
-                  RÉSERVER UN ESSAI IMMÉDIATEMENT
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* --- VIEW: ADMIN --- */}
-      {view === 'admin' && (
-        <section className="pt-32 pb-24 px-6 max-w-4xl mx-auto">
-          {!isAdmin ? (
-            <div className="bg-[#111] p-12 rounded-[40px] border border-[#bef264]/30 text-center">
-              <Lock size={48} className="text-[#bef264] mx-auto mb-6" />
-              <h2 className="text-3xl font-black uppercase italic mb-8">Accès <span className="text-[#bef264]">Admin</span></h2>
-              <form onSubmit={handleAdminLogin} className="space-y-4">
-                <input 
-                  type="password" 
-                  className="w-full bg-black border border-white/10 rounded-2xl p-4 text-white text-center focus:border-[#bef264] outline-none" 
-                  placeholder="Mot de passe" 
-                  value={adminPass}
-                  onChange={e => setAdminPass(e.target.value)}
-                />
-                <button type="submit" className="w-full bg-[#bef264] text-black py-4 rounded-2xl font-black uppercase italic shadow-lg shadow-[#bef264]/20">Se connecter</button>
-              </form>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              <div className="bg-[#111] p-12 rounded-[40px] border border-[#bef264]/30">
-                <h2 className="text-3xl font-black uppercase italic mb-10 text-center">AJOUTER UN <span className="text-[#bef264]">VÉHICULE</span></h2>
-                <form onSubmit={handleAddCar} className="space-y-8">
-                  <div className="grid grid-cols-2 gap-6">
-                    <input required className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Marque" value={newCar.brand} onChange={e => setNewCar({...newCar, brand: e.target.value})} />
-                    <input required className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Modèle" value={newCar.model} onChange={e => setNewCar({...newCar, model: e.target.value})} />
-                    <input required type="number" className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Prix (€)" value={newCar.price} onChange={e => setNewCar({...newCar, price: e.target.value})} />
-                    <input required type="number" className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Kilométrage" value={newCar.km} onChange={e => setNewCar({...newCar, km: e.target.value})} />
-                    <input required className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors" placeholder="Année" value={newCar.year} onChange={e => setNewCar({...newCar, year: e.target.value})} />
-                    <select className="bg-black border border-white/10 rounded-2xl p-5 text-white outline-none focus:border-[#bef264] transition-colors appearance-none" value={newCar.fuel} onChange={e => setNewCar({...newCar, fuel: e.target.value})}>
-                      <option>Essence</option>
-                      <option>Diesel</option>
-                      <option>Hybride</option>
-                      <option>Électrique</option>
-                    </select>
-                  </div>
-                  
-                  <div 
-                    onClick={() => fileInputRef.current.click()}
-                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                    onDrop={(e) => { e.preventDefault(); e.stopPropagation(); processFiles(Array.from(e.dataTransfer.files)); }}
-                    className="relative border-2 border-dashed border-white/10 rounded-[40px] p-12 flex flex-col items-center justify-center gap-4 hover:border-[#bef264]/50 cursor-pointer transition-all bg-black/30 group"
-                  >
-                    <input type="file" multiple hidden ref={fileInputRef} onChange={handleFileUpload} accept="image/*" />
-                    <div className="w-20 h-20 rounded-full bg-[#bef264]/10 flex items-center justify-center text-[#bef264] group-hover:scale-110 transition-transform">
-                      <Upload size={32} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-white font-black uppercase italic tracking-widest mb-1">Ajouter autant de photos que vous voulez</p>
-                      <p className="text-slate-500 text-xs font-bold uppercase italic tracking-widest">Glissez-déposez ici</p>
-                    </div>
-                  </div>
-
-                  {newCar.images.length > 0 && (
-                    <div className="grid grid-cols-4 md:grid-cols-6 gap-4 p-4 bg-white/5 rounded-3xl border border-white/5">
-                      {newCar.images.map((img, i) => (
-                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-white/10 group">
-                          <img src={img} className="w-full h-full object-cover" />
-                          <button 
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); removeImage(i); }} 
-                            className="absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <X size={12} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <textarea className="w-full bg-black border border-white/10 rounded-[30px] p-6 text-white h-40 outline-none focus:border-[#bef264] transition-colors italic font-medium" placeholder="Description détaillée du véhicule (utilisez des retours à la ligne pour plus de clarté)..." value={newCar.description} onChange={e => setNewCar({...newCar, description: e.target.value})}></textarea>
-                  
-                  <div className="grid grid-cols-3 gap-4">
-                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs text-center outline-none focus:border-[#bef264] transition-colors" placeholder="Boite (ex: Automatique)" value={newCar.transmission} onChange={e => setNewCar({...newCar, transmission: e.target.value})} />
-                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs text-center outline-none focus:border-[#bef264] transition-colors" placeholder="Puissance (ex: 421 ch)" value={newCar.power} onChange={e => setNewCar({...newCar, power: e.target.value})} />
-                    <input className="bg-black border border-white/10 rounded-2xl p-4 text-white text-xs text-center outline-none focus:border-[#bef264] transition-colors" placeholder="Couleur" value={newCar.color} onChange={e => setNewCar({...newCar, color: e.target.value})} />
-                  </div>
-
-                  <button type="submit" className="w-full bg-[#bef264] text-black py-6 rounded-[30px] font-black uppercase italic text-xl shadow-xl shadow-[#bef264]/20 hover:scale-[1.01] transition-transform">
-                    METTRE EN LIGNE LE VÉHICULE
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* --- WHY CHOOSE US (Global) --- */}
-      <section className="py-24 px-6 bg-[#0a0a0a] border-y border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-[0.02] pointer-events-none">
-          <div className="w-full h-full" style={{backgroundImage: 'radial-gradient(#bef264 2px, transparent 2px)', backgroundSize: '30px 30px'}}></div>
-        </div>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#bef264]/10 border border-[#bef264]/20 text-[#bef264] text-[9px] font-black uppercase tracking-[0.3em] mb-8">
-              <Star size={12} fill="currentColor" /> L'EXCELLENCE DEPUIS L'OUVERTURE
-            </div>
-            <h2 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter mb-10 leading-[0.9]">
-              Pourquoi <br/>
-              <span className="text-[#bef264]">Nous Choisir ?</span>
-            </h2>
-            <p className="text-slate-400 text-lg font-medium leading-relaxed mb-12 italic border-l-2 border-[#bef264] pl-6">
-              Service de confiance, transactions transparentes et véhicules sur lesquels vous pouvez compter.
-            </p>
-            <div className="space-y-6">
-              {[
-                { title: "Expertise Reconnue", desc: "Plus de 750 ventes réussies à notre actif avec des clients satisfaits." },
-                { title: "Garantie Totale", desc: "Tous nos véhicules sont rigoureusement révisés et garantis 3 mois." },
-                { title: "Service Carte Grise", desc: "Nous gérons toutes les démarches administratives ANTS pour vous." }
-              ].map((item, i) => (
-                <div key={i} className="flex gap-6 p-8 bg-white/5 rounded-[30px] border border-white/10 hover:border-[#bef264]/30 transition-all group">
-                  <div className="w-14 h-14 bg-[#bef264] rounded-full flex items-center justify-center text-black shrink-0 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(190,242,100,0.3)]">
-                    <CheckCircle2 size={28} />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-black uppercase italic mb-1 text-lg">{item.title}</h4>
-                    <p className="text-slate-500 text-sm font-medium italic leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="relative">
-            <div className="aspect-square rounded-[60px] overflow-hidden border border-[#bef264]/20 shadow-2xl shadow-[#bef264]/10">
-              <img src="https://images.unsplash.com/photo-1562141989-c5c79ac8f576?auto=format&fit=crop&q=80&w=1200" alt="BRL Negoce Auto" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" />
-            </div>
-            <div className="absolute -bottom-10 -left-10 bg-[#bef264] p-12 rounded-[50px] shadow-2xl shadow-[#bef264]/30 hidden md:block group hover:scale-105 transition-transform">
-              <span className="text-black font-black text-7xl italic leading-none block">10+</span>
-              <span className="text-black font-black text-xs uppercase tracking-[0.3em]">Ans d'expertise</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- MAP SECTION --- */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="bg-[#111] rounded-[60px] border border-white/5 overflow-hidden shadow-2xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            <div className="p-12 md:p-20">
-              <h2 className="text-5xl font-black uppercase italic mb-8 tracking-tighter">Nous <span className="text-[#bef264]">Trouver</span></h2>
-              <div className="space-y-8">
-                <div className="flex items-start gap-6">
-                  <div className="bg-[#bef264] text-black p-4 rounded-2xl shadow-lg shadow-[#bef264]/20"><MapPin size={24} /></div>
-                  <div>
-                    <h4 className="font-black uppercase italic text-lg mb-2">Notre Garage</h4>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest leading-relaxed">
-                      {BRAND.address} <br/> Billy-Berclau, France
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-6">
-                  <div className="bg-[#bef264] text-black p-4 rounded-2xl shadow-lg shadow-[#bef264]/20"><Phone size={24} /></div>
-                  <div>
-                    <h4 className="font-black uppercase italic text-lg mb-2">Contact Direct</h4>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest">{BRAND.phone}</p>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest">{BRAND.email}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="h-[400px] lg:h-auto border-l border-white/10 grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2537.915124673641!2d2.856980577030807!3d50.49853997159781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47dd395493064e43%3A0x6b1f2e96d9365611!2s6%20Rue%20Jules%20Ferry%2C%2062138%20Billy-Berclau!5e0!3m2!1sfr!2sfr!4v1710123456789!5m2!1sfr!2sfr" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                allowFullScreen="" 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade">
-              </iframe>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- FOOTER FINAL --- */}
-      <footer className="relative bg-[#050505] pt-32 pb-12 px-6 border-t border-white/5 overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-10 grayscale hover:opacity-20 transition-opacity duration-1000">
-           <img 
-            src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&q=80&w=2000" 
-            alt="Footer Background" 
-            className="w-full h-full object-cover"
-           />
-        </div>
-        <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <div className="flex flex-col items-center gap-12">
-            <div className="flex flex-col items-center gap-6">
-              <BRLLogo size="lg" />
-              <div className="flex flex-col items-center gap-2">
-                <h3 className="text-white font-black text-5xl italic uppercase tracking-tighter leading-none">
-                  BRL <span className="text-[#bef264]">NÉGOCE AUTO</span>
-                </h3>
-                <p className="text-slate-500 font-bold uppercase tracking-[0.5em] text-[10px]">L'excellence à votre service depuis l'ouverture</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap justify-center gap-12 text-[#bef264]">
-              <a href={BRAND.facebookUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 group">
-                <div className="p-4 rounded-full border border-[#bef264]/20 group-hover:bg-[#bef264] group-hover:text-black transition-all">
-                  <Facebook size={24} />
-                </div>
-                <span className="text-[8px] font-black uppercase tracking-widest text-white/50 group-hover:text-white">Facebook</span>
-              </a>
-              <a href={`mailto:${BRAND.email}`} className="flex flex-col items-center gap-2 group">
-                <div className="p-4 rounded-full border border-[#bef264]/20 group-hover:bg-[#bef264] group-hover:text-black transition-all">
-                  <Mail size={24} />
-                </div>
-                <span className="text-[8px] font-black uppercase tracking-widest text-white/50 group-hover:text-white">Email</span>
-              </a>
-              <a href={`tel:${BRAND.phone}`} className="flex flex-col items-center gap-2 group">
-                <div className="p-4 rounded-full border border-[#bef264]/20 group-hover:bg-[#bef264] group-hover:text-black transition-all">
-                  <Phone size={24} />
-                </div>
-                <span className="text-[8px] font-black uppercase tracking-widest text-white/50 group-hover:text-white">Téléphone</span>
-              </a>
-            </div>
-            <div className="w-full max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-            <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.5em]">
-              © 2026 {BRAND.name} • TOUS DROITS RÉSERVÉS
-            </p>
-          </div>
-        </div>
-      </footer>
-
-      {/* Floating Call Button */}
-      <a href={`tel:${BRAND.phone}`} className="fixed bottom-8 right-8 z-[110] bg-[#bef264] text-black w-20 h-20 rounded-full flex items-center justify-center shadow-[0_15px_40px_rgba(190,242,100,0.4)] hover:scale-110 transition-transform active:scale-95 group overflow-hidden">
-        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-        <Phone size={32} className="relative z-10" />
-      </a>
+    <div className="min-h-screen bg-white">
+      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} setShowAdmin={setShowAdmin} />
+      <main>{renderPage()}</main>
+      <Footer setCurrentPage={setCurrentPage} />
     </div>
   );
 }
