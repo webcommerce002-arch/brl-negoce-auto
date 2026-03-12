@@ -4,18 +4,16 @@
 
 @layer base {
   body {
-    @apply bg-[#0a0a0a] text-slate-200;
-    background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
-    background-size: 16px 16px;
+    @apply bg-white text-gray-900;
   }
 }
 
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #bef264; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #a8d84e; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #8CB63C; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #6d9330; }
 
-::selection { background: #bef264; color: black; }
+::selection { background: #8CB63C; color: white; }
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -23,7 +21,7 @@
 /* Firefox scrollbar */
 html {
   scrollbar-width: thin;
-  scrollbar-color: #bef264 #0a0a0a;
+  scrollbar-color: #8CB63C #f5f5f5;
   scroll-behavior: smooth;
 }
 
